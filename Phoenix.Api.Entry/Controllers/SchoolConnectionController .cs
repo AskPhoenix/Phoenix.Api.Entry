@@ -26,22 +26,19 @@ namespace Phoenix.Api.Entry.Controllers
             _schoolConnectionRepository = new(phoenixContext);
         }
 
-        [HttpPost("facebook/{school_id}")]
+        [HttpPost("facebook/{key}")]
         public async Task<SchoolConnectionApi?> FacebookRegisterAsync(
-            int school_id, [Required] string facebook_key, bool activate = true)
+            [Required] int school_id, string key, bool activate = true)
         {
             // TODO: Allow registration to other channels as well
             // TODO: Connect to Azure Bot
 
             _logger.LogInformation("Entry -> School Connection -> Facebook -> Register -> {id}", school_id);
 
-            if (string.IsNullOrWhiteSpace(facebook_key))
+            if (string.IsNullOrWhiteSpace(key))
                 return null;
 
-            var school = this.PhoenixUser?
-                .Schools
-                .SingleOrDefault(s => s.Id == school_id);
-
+            var school = this.FindSchool(school_id);
             if (school is null)
                 return null;
 
@@ -49,7 +46,7 @@ namespace Phoenix.Api.Entry.Controllers
             try
             {
                 connection = await _schoolConnectionRepository
-                    .RegisterAsync(ChannelProvider.Facebook, facebook_key, school_id, activate);
+                    .RegisterAsync(ChannelProvider.Facebook, key, school_id, activate);
             }
             catch(InvalidOperationException) 
             {
@@ -59,28 +56,33 @@ namespace Phoenix.Api.Entry.Controllers
             return new SchoolConnectionApi(connection);
         }
 
-        [HttpGet("facebook/{school_id}")]
-        public IEnumerable<SchoolConnectionApi>? FacebookGet(int school_id)
+        [HttpGet("facebook/{key}")]
+        public async Task<SchoolConnectionApi?> FacebookGet(string key)
         {
             _logger.LogInformation("Entry -> School Connection -> Facebook -> Get");
 
-            var school = this.PhoenixUser?
-                .Schools
-                .SingleOrDefault(s => s.Id == school_id);
+            if (string.IsNullOrWhiteSpace(key))
+                return null;
 
+            var connection = await _schoolConnectionRepository
+                .FindUniqueAsync(ChannelProvider.Facebook, key);
+
+            if (connection is null)
+                return null;
+
+            var school = this.FindSchool(connection.TenantId);
             if (school is null)
                 return null;
 
-            return school.SchoolConnections
-                .Select(c => new SchoolConnectionApi(c));
+            return new SchoolConnectionApi(connection);
         }
 
-        [HttpPut("facebook/connect")]
-        public async Task<SchoolConnectionApi?> FacebookConnectAsync([Required] string facebook_key)
+        [HttpPut("facebook/connect/{key}")]
+        public async Task<SchoolConnectionApi?> FacebookConnectAsync(string key)
         {
             _logger.LogInformation("Entry -> School Connection -> Facebook -> Connect");
 
-            if (string.IsNullOrWhiteSpace(facebook_key))
+            if (string.IsNullOrWhiteSpace(key))
                 return null;
 
             School? school;
@@ -88,20 +90,17 @@ namespace Phoenix.Api.Entry.Controllers
             try
             {
                 connection = await _schoolConnectionRepository
-                    .FindUniqueAsync(ChannelProvider.Facebook, facebook_key);
+                    .FindUniqueAsync(ChannelProvider.Facebook, key);
 
                 if (connection is null)
                     return null;
 
-                school = this.PhoenixUser?
-                .Schools
-                .SingleOrDefault(s => s.Id == connection.TenantId);
-
+                school = this.FindSchool(connection.TenantId);
                 if (school is null)
                     return null;
 
                 connection = await _schoolConnectionRepository
-                    .ConnectAsync(ChannelProvider.Facebook, facebook_key);
+                    .ConnectAsync(ChannelProvider.Facebook, key);
             }
             catch (InvalidOperationException)
             {
@@ -111,12 +110,12 @@ namespace Phoenix.Api.Entry.Controllers
             return new SchoolConnectionApi(connection);
         }
 
-        [HttpPut("facebook/disconnect")]
-        public async Task<SchoolConnectionApi?> FacebookDisconnectAsync([Required] string facebook_key)
+        [HttpPut("facebook/disconnect/{key}")]
+        public async Task<SchoolConnectionApi?> FacebookDisconnectAsync(string key)
         {
             _logger.LogInformation("Entry -> School Connection -> Facebook -> Disconnect");
 
-            if (string.IsNullOrWhiteSpace(facebook_key))
+            if (string.IsNullOrWhiteSpace(key))
                 return null;
 
             School? school;
@@ -124,20 +123,17 @@ namespace Phoenix.Api.Entry.Controllers
             try
             {
                 connection = await _schoolConnectionRepository
-                    .FindUniqueAsync(ChannelProvider.Facebook, facebook_key);
+                    .FindUniqueAsync(ChannelProvider.Facebook, key);
 
                 if (connection is null)
                     return null;
 
-                school = this.PhoenixUser?
-                .Schools
-                .SingleOrDefault(s => s.Id == connection.TenantId);
-
+                school = this.FindSchool(connection.TenantId);
                 if (school is null)
                     return null;
 
                 connection = await _schoolConnectionRepository
-                    .DisconnectAsync(ChannelProvider.Facebook, facebook_key);
+                    .DisconnectAsync(ChannelProvider.Facebook, key);
             }
             catch (InvalidOperationException)
             {
@@ -147,24 +143,21 @@ namespace Phoenix.Api.Entry.Controllers
             return new SchoolConnectionApi(connection);
         }
 
-        [HttpDelete("facebook")]
-        public async Task<IActionResult> FacebookDeleteAsync([Required] string facebook_key)
+        [HttpDelete("facebook/{key}")]
+        public async Task<IActionResult> FacebookDeleteAsync(string key)
         {
             _logger.LogInformation("Entry -> School Connection -> Facebook -> Delete");
 
-            if (string.IsNullOrWhiteSpace(facebook_key))
+            if (string.IsNullOrWhiteSpace(key))
                 return BadRequest();
 
             var connection = await _schoolConnectionRepository
-                .FindUniqueAsync(ChannelProvider.Facebook, facebook_key);
+                .FindUniqueAsync(ChannelProvider.Facebook, key);
 
             if (connection is null)
                 return BadRequest();
 
-            var school = this.PhoenixUser?
-                .Schools
-                .SingleOrDefault(s => s.Id == connection.TenantId);
-
+            var school = this.FindSchool(connection.TenantId);
             if (school is null)
                 return BadRequest();
 

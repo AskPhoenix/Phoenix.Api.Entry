@@ -14,7 +14,6 @@ namespace Phoenix.Api.Entry.Controllers
     public class SchoolController : ApplicationController
     {
         private readonly SchoolRepository _schoolRepository;
-        private readonly SchoolConnectionRepository _schoolConnectionRepository;
 
         public SchoolController(
             PhoenixContext phoenixContext,
@@ -22,8 +21,7 @@ namespace Phoenix.Api.Entry.Controllers
             ILogger<SchoolController> logger)
             : base(phoenixContext, userManager, logger)
         {
-            _schoolRepository = new(phoenixContext);
-            _schoolConnectionRepository = new(phoenixContext);
+            _schoolRepository = new(phoenixContext, nonObviatedOnly: true);
         }
 
         [HttpPost]
@@ -63,14 +61,66 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> School -> Get -> {id}", id);
 
-            var school = this.PhoenixUser?
-                .Schools
-                .SingleOrDefault(s => s.Id == id);
-
+            var school = this.FindSchool(id);
             if (school is null)
                 return null;
 
             return new SchoolApi(school);
+        }
+
+        [HttpGet("connections/{id}")]
+        public IEnumerable<SchoolConnectionApi>? GetConnections(int id)
+        {
+            _logger.LogInformation("Entry -> School -> Get -> Connections -> {id}", id);
+
+            var school = this.FindSchool(id);
+            if (school is null)
+                return null;
+
+            return school.SchoolConnections
+                .Select(c => new SchoolConnectionApi(c));
+        }
+
+        [HttpGet("courses/{id}")]
+        public IEnumerable<CourseApi>? GetCourses(int id)
+        {
+            _logger.LogInformation("Entry -> School -> Get -> Courses -> {id}", id);
+
+            var school = this.FindSchool(id);
+            if (school is null)
+                return null;
+
+            return school.Courses
+                .Where(c => c.ObviatedAt == null)
+                .Select(c => new CourseApi(c));
+        }
+
+        [HttpGet("classrooms/{id}")]
+        public IEnumerable<ClassroomApi>? GetClassrooms(int id)
+        {
+            _logger.LogInformation("Entry -> School -> Get -> Classrooms -> {id}", id);
+
+            var school = this.FindSchool(id);
+            if (school is null)
+                return null;
+
+            return school.Classrooms
+                .Where(c => c.ObviatedAt == null)
+                .Select(c => new ClassroomApi(c));
+        }
+
+        [HttpGet("users/{id}")]
+        public IEnumerable<UserApi>? GetUsers(int id)
+        {
+            _logger.LogInformation("Entry -> School -> Get -> Users -> {id}", id);
+
+            var school = this.FindSchool(id);
+            if (school is null)
+                return null;
+
+            return school.Users
+                .Where(u => u.ObviatedAt == null)
+                .Select(u => new UserApi(u));
         }
 
         [HttpPut("{id}")]
@@ -78,10 +128,7 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> School -> Put -> {id}", id);
 
-            var school = this.PhoenixUser?
-                .Schools
-                .SingleOrDefault(s => s.Id == id);
-
+            var school = this.FindSchool(id);
             if (school is null)
                 return null;
 
@@ -98,13 +145,11 @@ namespace Phoenix.Api.Entry.Controllers
             if (!this.CheckUserAuth())
                 return Unauthorized();
 
-            var isEnrolled = this.PhoenixUser!
-                .Schools
-                .Any(s => s.Id == id);
-
-            if (!isEnrolled)
+            var school = this.FindSchool(id);
+            if (school is null)
                 return BadRequest();
 
+            // TODO: Delete or Obviate ?
             await _schoolRepository.DeleteAsync(id);
 
             return Ok();
