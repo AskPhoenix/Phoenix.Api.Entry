@@ -4,7 +4,9 @@ using Phoenix.DataHandle.Api;
 using Phoenix.DataHandle.Api.Models;
 using Phoenix.DataHandle.Identity;
 using Phoenix.DataHandle.Main.Models;
+using Phoenix.DataHandle.Main.Types;
 using Phoenix.DataHandle.Repositories;
+using System.ComponentModel.DataAnnotations;
 
 namespace Phoenix.Api.Entry.Controllers
 {
@@ -14,6 +16,7 @@ namespace Phoenix.Api.Entry.Controllers
     public class SchoolController : ApplicationController
     {
         private readonly SchoolRepository _schoolRepository;
+        private readonly SchoolConnectionRepository _schoolConnectionRepository;
 
         public SchoolController(
             PhoenixContext phoenixContext,
@@ -22,6 +25,7 @@ namespace Phoenix.Api.Entry.Controllers
             : base(phoenixContext, userManager, logger)
         {
             _schoolRepository = new(phoenixContext);
+            _schoolConnectionRepository = new(phoenixContext);
         }
 
         [HttpPost]
@@ -104,6 +108,136 @@ namespace Phoenix.Api.Entry.Controllers
                 return;
 
             await _schoolRepository.DeleteAsync(id);
+        }
+
+        [HttpPost("facebook/register/{id}")]
+        public async Task<IActionResult> FacebookRegisterAsync(int id, [Required] string facebookKey)
+        {
+            // TODO: Allow registration to other channels as well
+            // TODO: Connect to Azure Bot
+
+            _logger.LogInformation("Entry -> School -> Register -> {id}", id);
+
+            if (string.IsNullOrWhiteSpace(facebookKey))
+                return BadRequest();
+
+            var school = this.PhoenixUser?
+                .Schools
+                .SingleOrDefault(s => s.Id == id);
+
+            if (school is null)
+                return BadRequest();
+
+            SchoolConnection connection;
+            try
+            {
+                connection = await _schoolConnectionRepository
+                    .RegisterAsync(ChannelProvider.Facebook, facebookKey, id);
+            }
+            catch(InvalidOperationException e) 
+            {
+                return BadRequest(e.Message);
+            }
+
+            return Ok(new SchoolConnectionApi(connection));
+        }
+
+        [HttpPost("facebook/connect")]
+        public async Task<IActionResult> FacebookConnectAsync([Required] string facebookKey)
+        {
+            _logger.LogInformation("Entry -> School -> Connect");
+
+            if (string.IsNullOrWhiteSpace(facebookKey))
+                return BadRequest();
+
+            School? school;
+            SchoolConnection? connection;
+            try
+            {
+                connection = await _schoolConnectionRepository
+                    .FindUniqueAsync(ChannelProvider.Facebook, facebookKey);
+
+                if (connection is null)
+                    return BadRequest();
+
+                school = this.PhoenixUser?
+                .Schools
+                .SingleOrDefault(s => s.Id == connection.TenantId);
+
+                if (school is null)
+                    return BadRequest();
+
+                connection = await _schoolConnectionRepository
+                    .ConnectAsync(ChannelProvider.Facebook, facebookKey);
+            }
+            catch (InvalidOperationException e)
+            {
+                return BadRequest(e.Message);
+            }
+
+            return Ok(new SchoolConnectionApi(connection));
+        }
+
+        [HttpPost("facebook/disconnect")]
+        public async Task<IActionResult> FacebookDisconnectAsync([Required] string facebookKey)
+        {
+            _logger.LogInformation("Entry -> School -> Disconnect");
+
+            if (string.IsNullOrWhiteSpace(facebookKey))
+                return BadRequest();
+
+            School? school;
+            SchoolConnection? connection;
+            try
+            {
+                connection = await _schoolConnectionRepository
+                    .FindUniqueAsync(ChannelProvider.Facebook, facebookKey);
+
+                if (connection is null)
+                    return BadRequest();
+
+                school = this.PhoenixUser?
+                .Schools
+                .SingleOrDefault(s => s.Id == connection.TenantId);
+
+                if (school is null)
+                    return BadRequest();
+
+                connection = await _schoolConnectionRepository
+                    .DisconnectAsync(ChannelProvider.Facebook, facebookKey);
+            }
+            catch (InvalidOperationException e)
+            {
+                return BadRequest(e.Message);
+            }
+
+            return Ok(new SchoolConnectionApi(connection));
+        }
+
+        [HttpDelete("facebook")]
+        public async Task<IActionResult> FacebookDeleteConnectionAsync([Required] string facebookKey)
+        {
+            _logger.LogInformation("Entry -> School -> Connection -> Delete");
+
+            if (string.IsNullOrWhiteSpace(facebookKey))
+                return BadRequest();
+
+            var connection = await _schoolConnectionRepository
+                .FindUniqueAsync(ChannelProvider.Facebook, facebookKey);
+
+            if (connection is null)
+                return BadRequest();
+
+            var school = this.PhoenixUser?
+                .Schools
+                .SingleOrDefault(s => s.Id == connection.TenantId);
+
+            if (school is null)
+                return BadRequest();
+
+            await _schoolConnectionRepository.DeleteAsync(connection);
+
+            return Ok();
         }
     }
 }
