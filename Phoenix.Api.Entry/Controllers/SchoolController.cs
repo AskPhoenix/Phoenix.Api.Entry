@@ -14,14 +14,17 @@ namespace Phoenix.Api.Entry.Controllers
     public class SchoolController : ApplicationController
     {
         private readonly SchoolRepository _schoolRepository;
+        private readonly ApplicationStore _appStore;
 
         public SchoolController(
             PhoenixContext phoenixContext,
             ApplicationUserManager userManager,
-            ILogger<SchoolController> logger)
+            ILogger<SchoolController> logger,
+            ApplicationStore appStore)
             : base(phoenixContext, userManager, logger)
         {
             _schoolRepository = new(phoenixContext, nonObviatedOnly: true);
+            _appStore = appStore;
         }
 
         [HttpPost]
@@ -110,7 +113,7 @@ namespace Phoenix.Api.Entry.Controllers
         }
 
         [HttpGet("users/{id}")]
-        public IEnumerable<UserApi>? GetUsers(int id)
+        public async Task<IEnumerable<AspNetUserApi>?> GetUsersAsync(int id)
         {
             _logger.LogInformation("Entry -> School -> Get -> Users -> {id}", id);
 
@@ -118,9 +121,19 @@ namespace Phoenix.Api.Entry.Controllers
             if (school is null)
                 return null;
 
-            return school.Users
-                .Where(u => u.ObviatedAt == null)
-                .Select(u => new UserApi(u));
+            var users = school.Users.Where(u => u.ObviatedAt == null);
+            
+            // TODO: Generalize with a method that takes users as argument
+            var tore = new List<AspNetUserApi>(users.Count());
+            foreach (var user in users)
+            {
+                var appUser = await _userManager.FindByIdAsync(user.AspNetUserId.ToString());
+                var roles = await _userManager.GetRolesAsync(appUser);
+
+                tore.Add(new(user, appUser, roles.ToList()));
+            }
+
+            return tore;
         }
 
         [HttpPut("{id}")]
@@ -149,8 +162,7 @@ namespace Phoenix.Api.Entry.Controllers
             if (school is null)
                 return BadRequest();
 
-            // TODO: Delete or Obviate ?
-            await _schoolRepository.DeleteAsync(id);
+            await _schoolRepository.DeleteAsync(school);
 
             return Ok();
         }

@@ -57,7 +57,7 @@ namespace Phoenix.Api.Entry.Controllers
         }
 
         [HttpGet("facebook/{key}")]
-        public async Task<SchoolConnectionApi?> FacebookGet(string key)
+        public async Task<SchoolConnectionApi?> FacebookGetAsync(string key)
         {
             _logger.LogInformation("Entry -> School Connection -> Facebook -> Get");
 
