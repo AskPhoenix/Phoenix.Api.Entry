@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Phoenix.DataHandle.Api;
 using Phoenix.DataHandle.Api.Models;
 using Phoenix.DataHandle.Identity;
 using Phoenix.DataHandle.Main.Models;
@@ -11,24 +10,17 @@ namespace Phoenix.Api.Entry.Controllers
     [Authorize(AuthenticationSchemes = "Bearer")]
     [ApiController]
     [Route("api/[controller]")]
-    public class CourseController : ApplicationController
+    public class CourseController : EntryController
     {
         private readonly CourseRepository _courseRepository;
 
         public CourseController(
             PhoenixContext phoenixContext,
             ApplicationUserManager userManager,
-            ILogger<SchoolController> logger)
+            ILogger<CourseController> logger)
             : base(phoenixContext, userManager, logger)
         {
             _courseRepository = new(phoenixContext, nonObviatedOnly: true);
-        }
-
-        private Course? FindCourse(int id)
-        {
-            return PhoenixUser?.Schools
-                .SelectMany(s => s.Courses)
-                .SingleOrDefault(c => c.Id == id);
         }
 
         [HttpPost]

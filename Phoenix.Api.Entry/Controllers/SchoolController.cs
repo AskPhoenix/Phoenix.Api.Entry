@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Phoenix.DataHandle.Api;
 using Phoenix.DataHandle.Api.Models;
 using Phoenix.DataHandle.Identity;
 using Phoenix.DataHandle.Main.Models;
@@ -11,7 +10,7 @@ namespace Phoenix.Api.Entry.Controllers
     [Authorize(AuthenticationSchemes = "Bearer")]
     [ApiController]
     [Route("api/[controller]")]
-    public class SchoolController : ApplicationController
+    public class SchoolController : EntryController
     {
         private readonly SchoolRepository _schoolRepository;
         private readonly ApplicationStore _appStore;
