@@ -146,6 +146,32 @@ namespace Phoenix.Api.Entry.Controllers
             return new CourseApi(course);
         }
 
+        [HttpPut("books/{id}")]
+        public async Task<IEnumerable<BookApi>?> PutBooksAsync(int id, [FromBody] List<int> bookIds)
+        {
+            _logger.LogInformation("Entry -> Course -> Put -> Books -> {id}", id);
+
+            var course = this.FindCourse(id);
+            if (course is null)
+                return null;
+
+            course.Books.Clear();
+
+            Book? book;
+            foreach (var bookId in bookIds)
+            {
+                book = this.FindBook(bookId);
+                if (book is null)
+                    continue;
+
+                course.Books.Add(book);
+            }
+
+            course = await _courseRepository.UpdateAsync(course);
+
+            return course.Books.Select(b => new BookApi(b));
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
