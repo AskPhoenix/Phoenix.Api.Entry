@@ -1,9 +1,14 @@
-﻿using Phoenix.DataHandle.Api;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Phoenix.DataHandle.Api;
 using Phoenix.DataHandle.Identity;
 using Phoenix.DataHandle.Main.Models;
 
 namespace Phoenix.Api.Entry.Controllers
 {
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [ApiController]
+    [Route("api/[controller]")]
     public abstract class EntryController : ApplicationController
     {
         protected EntryController(

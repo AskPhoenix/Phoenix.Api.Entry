@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Phoenix.DataHandle.Api.Models;
 using Phoenix.DataHandle.Identity;
 using Phoenix.DataHandle.Main.Models;
@@ -7,9 +6,6 @@ using Phoenix.DataHandle.Repositories;
 
 namespace Phoenix.Api.Entry.Controllers
 {
-    [Authorize(AuthenticationSchemes = "Bearer")]
-    [ApiController]
-    [Route("api/[controller]")]
     public class BookController : EntryController
     {
         private readonly BookRepository _bookRepository;
