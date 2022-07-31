@@ -114,7 +114,7 @@
         }
 
         [HttpGet("{id}/users")]
-        public async Task<IEnumerable<AspNetUserApi>?> GetUsersAsync(int id)
+        public async Task<IEnumerable<ApplicationUserApi>?> GetUsersAsync(int id)
         {
             _logger.LogInformation("Entry -> Course -> Get -> Users -> {id}", id);
 
@@ -123,7 +123,7 @@
                 return null;
 
             var users = course.Users.Where(u => u.ObviatedAt == null);
-            var tore = new List<AspNetUserApi>(users.Count());
+            var tore = new List<ApplicationUserApi>(users.Count());
 
             foreach (var user in users)
             {

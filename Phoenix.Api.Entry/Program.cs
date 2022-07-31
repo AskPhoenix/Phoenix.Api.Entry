@@ -88,7 +88,7 @@ builder.Services.AddSwaggerGen(o =>
         string tag = string.Empty;
 
         if (!string.IsNullOrEmpty(api.GroupName))
-            tag = api.GroupName + " - ";
+            tag = $"{api.GroupName} \u2013 ";
 
         if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
             tag += controllerActionDescriptor.ControllerName;

@@ -100,7 +100,7 @@
         }
 
         [HttpGet("{id}/users")]
-        public async Task<IEnumerable<AspNetUserApi>?> GetUsersAsync(int id)
+        public async Task<IEnumerable<ApplicationUserApi>?> GetUsersAsync(int id)
         {
             _logger.LogInformation("Entry -> School -> Get -> Users -> {id}", id);
 
@@ -111,7 +111,7 @@
             var users = school.Users.Where(u => u.ObviatedAt == null);
 
             // TODO: Generalize with a method that takes users as argument
-            var tore = new List<AspNetUserApi>(users.Count());
+            var tore = new List<ApplicationUserApi>(users.Count());
             foreach (var user in users)
             {
                 var appUser = await _userManager.FindByIdAsync(user.AspNetUserId.ToString());
