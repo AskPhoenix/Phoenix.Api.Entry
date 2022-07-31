@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Phoenix.DataHandle.Api.Models;
-using Phoenix.DataHandle.Identity;
-using Phoenix.DataHandle.Main.Models;
-using Phoenix.DataHandle.Main.Types;
-using Phoenix.DataHandle.Repositories;
+﻿using Phoenix.DataHandle.Main.Types;
 using System.ComponentModel.DataAnnotations;
 
 namespace Phoenix.Api.Entry.Controllers
