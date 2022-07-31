@@ -2,6 +2,8 @@
 
 namespace Phoenix.Api.Entry.Controllers
 {
+    // TODO: Remove from Pavo and use through Egretta
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class LectureController : EntryController<Lecture, LectureApi>
     {
         private readonly LectureRepository _lectureRepository;
@@ -20,13 +22,13 @@ namespace Phoenix.Api.Entry.Controllers
             if (lecture is null)
                 return false;
 
-            if (this.FindCourse(lecture.CourseId) is null)
+            if (FindCourse(lecture.CourseId) is null)
                 return false;
 
-            if (lecture.ClassroomId.HasValue && this.FindClassroom(lecture.ClassroomId.Value) is null)
+            if (lecture.ClassroomId.HasValue && FindClassroom(lecture.ClassroomId.Value) is null)
                 return false;
 
-            if (lecture.ScheduleId.HasValue && this.FindSchedule(lecture.ScheduleId.Value) is null)
+            if (lecture.ScheduleId.HasValue && FindSchedule(lecture.ScheduleId.Value) is null)
                 return false;
 
             if (lecture.EndDateTime.TimeOfDay <= lecture.StartDateTime.TimeOfDay)
@@ -43,6 +45,7 @@ namespace Phoenix.Api.Entry.Controllers
             var lecture = lectureApi.ToLecture();
             lecture.Id = 0;
             lecture.Occasion = LectureOccasion.Exceptional;
+            lecture.ScheduleId = null;
 
             if (!Check(lecture))
                 return null;
@@ -57,13 +60,14 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> Lecture -> Post");
 
-            var lectureToBeReplaced = this.FindLecture(id);
+            var lectureToBeReplaced = FindLecture(id);
             if (lectureToBeReplaced is null)
                 return null;
 
             var lectureReplacement = lectureApi.ToLecture();
             lectureReplacement.Id = 0;
             lectureReplacement.Occasion = LectureOccasion.Replacement;
+            lectureReplacement.ScheduleId = null;
 
             if (!Check(lectureReplacement))
                 return null;
@@ -81,7 +85,7 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> Lecture -> Get");
 
-            return this.PhoenixUser?
+            return PhoenixUser?
                 .Schools
                 .SelectMany(s => s.Courses)
                 .SelectMany(c => c.Lectures)
@@ -93,7 +97,7 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> Lecture -> Get -> {id}", id);
 
-            var lecture = this.FindLecture(id);
+            var lecture = FindLecture(id);
             if (lecture is null)
                 return null;
 
@@ -105,7 +109,7 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> Lecture -> Put -> {id}", id);
 
-            var lecture = this.FindLecture(id);
+            var lecture = FindLecture(id);
             if (lecture is null)
                 return null;
 
@@ -124,10 +128,10 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> Lecture -> Delete -> {id}", id);
 
-            if (!this.CheckUserAuth())
+            if (!CheckUserAuth())
                 return Unauthorized();
 
-            var lecture = this.FindLecture(id);
+            var lecture = FindLecture(id);
             if (lecture is null)
                 return BadRequest();
 

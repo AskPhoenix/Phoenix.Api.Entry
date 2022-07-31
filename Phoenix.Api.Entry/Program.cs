@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Phoenix.DataHandle.Identity;
-using Phoenix.DataHandle.Main.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,7 +53,7 @@ builder.Services.AddSwaggerGen(o =>
     o.EnableAnnotations();
 
     // SwaggerDoc name refers to the name of the documention and is included in the endpoint path
-    o.SwaggerDoc("v3", new Microsoft.OpenApi.Models.OpenApiInfo()
+    o.SwaggerDoc("v3", new OpenApiInfo()
     {
         Title = "Pavo API",
         Description = "A Rest API for the school data entry.",
@@ -83,6 +82,21 @@ builder.Services.AddSwaggerGen(o =>
     {
         { jwtSecurityScheme, Array.Empty<string>() }
     });
+
+    o.TagActionsBy(api =>
+    {
+        string tag = string.Empty;
+
+        if (!string.IsNullOrEmpty(api.GroupName))
+            tag = api.GroupName + " - ";
+
+        if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
+            tag += controllerActionDescriptor.ControllerName;
+
+        return new string[] { tag };
+    });
+
+    o.DocInclusionPredicate((name, api) => true);
 });
 
 // Configure Logging

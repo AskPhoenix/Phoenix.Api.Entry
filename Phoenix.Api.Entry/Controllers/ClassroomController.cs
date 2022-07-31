@@ -1,5 +1,6 @@
 ﻿namespace Phoenix.Api.Entry.Controllers
 {
+    [ApiExplorerSettings(GroupName = "3a")]
     public class ClassroomController : EntryController<Classroom, ClassroomApi>
     {
         private readonly ClassroomRepository _classroomRepository;
@@ -18,7 +19,7 @@
             if (classroom is null)
                 return false;
 
-            if (this.FindSchool(classroom.SchoolId) is null)
+            if (FindSchool(classroom.SchoolId) is null)
                 return false;
 
             return true;
@@ -45,7 +46,7 @@
         {
             _logger.LogInformation("Entry -> Classroom -> Get");
 
-            return this.PhoenixUser?
+            return PhoenixUser?
                 .Schools
                 .SelectMany(s => s.Classrooms)
                 .Select(c => new ClassroomApi(c));
@@ -56,7 +57,7 @@
         {
             _logger.LogInformation("Entry -> Classroom -> Get -> {id}", id);
 
-            var classroom = this.FindClassroom(id);
+            var classroom = FindClassroom(id);
             if (classroom is null)
                 return null;
 
@@ -68,7 +69,7 @@
         {
             _logger.LogInformation("Entry -> Classroom -> Get -> Lectures -> {id}", id);
 
-            var classroom = this.FindClassroom(id);
+            var classroom = FindClassroom(id);
             if (classroom is null)
                 return null;
 
@@ -81,7 +82,7 @@
         {
             _logger.LogInformation("Entry -> Classroom -> Get -> Schedules -> {id}", id);
 
-            var classroom = this.FindClassroom(id);
+            var classroom = FindClassroom(id);
             if (classroom is null)
                 return null;
 
@@ -94,7 +95,7 @@
         {
             _logger.LogInformation("Entry -> Classroom -> Put -> {id}", id);
 
-            var classroom = this.FindClassroom(id);
+            var classroom = FindClassroom(id);
             if (classroom is null)
                 return null;
 
@@ -113,10 +114,10 @@
         {
             _logger.LogInformation("Entry -> Classroom -> Delete -> {id}", id);
 
-            if (!this.CheckUserAuth())
+            if (!CheckUserAuth())
                 return Unauthorized();
 
-            var classroom = this.FindClassroom(id);
+            var classroom = FindClassroom(id);
             if (classroom is null)
                 return BadRequest();
 

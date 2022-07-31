@@ -1,5 +1,6 @@
 ﻿namespace Phoenix.Api.Entry.Controllers
 {
+    [ApiExplorerSettings(GroupName = "1a")]
     public class SchoolController : EntryController<School, SchoolApi>
     {
         private readonly SchoolRepository _schoolRepository;
@@ -18,14 +19,14 @@
         {
             _logger.LogInformation("Entry -> School -> Post");
 
-            if (!this.CheckUserAuth())
+            if (!CheckUserAuth())
                 return null;
 
             var school = schoolApi.ToSchool();
             school.Id = 0;
             school.Code = 0;
             school.SchoolSetting.SchoolId = 0;
-            school.Users.Add(this.PhoenixUser!);
+            school.Users.Add(PhoenixUser!);
 
             school = await _schoolRepository.CreateAsync(school);
 
@@ -40,7 +41,7 @@
         {
             _logger.LogInformation("Entry -> School -> Get");
 
-            return this.PhoenixUser?
+            return PhoenixUser?
                 .Schools
                 .Select(s => new SchoolApi(s));
         }
@@ -50,7 +51,7 @@
         {
             _logger.LogInformation("Entry -> School -> Get -> {id}", id);
 
-            var school = this.FindSchool(id);
+            var school = FindSchool(id);
             if (school is null)
                 return null;
 
@@ -62,7 +63,7 @@
         {
             _logger.LogInformation("Entry -> School -> Get -> Connections -> {id}", id);
 
-            var school = this.FindSchool(id);
+            var school = FindSchool(id);
             if (school is null)
                 return null;
 
@@ -75,7 +76,7 @@
         {
             _logger.LogInformation("Entry -> School -> Get -> Courses -> {id}", id);
 
-            var school = this.FindSchool(id);
+            var school = FindSchool(id);
             if (school is null)
                 return null;
 
@@ -89,7 +90,7 @@
         {
             _logger.LogInformation("Entry -> School -> Get -> Classrooms -> {id}", id);
 
-            var school = this.FindSchool(id);
+            var school = FindSchool(id);
             if (school is null)
                 return null;
 
@@ -103,12 +104,12 @@
         {
             _logger.LogInformation("Entry -> School -> Get -> Users -> {id}", id);
 
-            var school = this.FindSchool(id);
+            var school = FindSchool(id);
             if (school is null)
                 return null;
 
             var users = school.Users.Where(u => u.ObviatedAt == null);
-            
+
             // TODO: Generalize with a method that takes users as argument
             var tore = new List<AspNetUserApi>(users.Count());
             foreach (var user in users)
@@ -127,7 +128,7 @@
         {
             _logger.LogInformation("Entry -> School -> Put -> {id}", id);
 
-            var school = this.FindSchool(id);
+            var school = FindSchool(id);
             if (school is null)
                 return null;
 
@@ -142,10 +143,10 @@
         {
             _logger.LogInformation("Entry -> School -> Delete -> {id}", id);
 
-            if (!this.CheckUserAuth())
+            if (!CheckUserAuth())
                 return Unauthorized();
 
-            var school = this.FindSchool(id);
+            var school = FindSchool(id);
             if (school is null)
                 return BadRequest();
 

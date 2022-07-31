@@ -2,6 +2,7 @@
 
 namespace Phoenix.Api.Entry.Controllers
 {
+    [ApiExplorerSettings(GroupName = "3b")]
     public class ScheduleController : EntryController<Schedule, ScheduleApi>
     {
         private readonly ScheduleRepository _scheduleRepository;
@@ -25,11 +26,11 @@ namespace Phoenix.Api.Entry.Controllers
             if (schedule.EndTime < schedule.StartTime)
                 return false;
 
-            if (this.FindCourse(schedule.CourseId) is null)
+            if (FindCourse(schedule.CourseId) is null)
                 return false;
 
             if (schedule.ClassroomId.HasValue)
-                if (this.FindClassroom(schedule.ClassroomId.Value) is null)
+                if (FindClassroom(schedule.ClassroomId.Value) is null)
                     schedule.ClassroomId = null;
 
             return true;
@@ -56,7 +57,7 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> Schedule -> Get");
 
-            return this.PhoenixUser?
+            return PhoenixUser?
                 .Schools
                 .SelectMany(s => s.Courses)
                 .SelectMany(c => c.Schedules)
@@ -68,7 +69,7 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> Schedule -> Get -> {id}", id);
 
-            var schedule = this.FindSchedule(id);
+            var schedule = FindSchedule(id);
             if (schedule is null)
                 return null;
 
@@ -80,7 +81,7 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> Schedule -> Get -> Lectures -> {id}", id);
 
-            var schedule = this.FindSchedule(id);
+            var schedule = FindSchedule(id);
             if (schedule is null)
                 return null;
 
@@ -93,12 +94,12 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> Schedule -> Put -> {id}", id);
 
-            var schedule = this.FindSchedule(id);
+            var schedule = FindSchedule(id);
             if (schedule is null)
                 return null;
 
             schedule = scheduleApi.ToSchedule(schedule);
-           
+
             if (!Check(schedule))
                 return null;
 
@@ -112,7 +113,7 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> Schedule -> Put -> Lectures -> {id}", id);
 
-            var schedule = this.FindSchedule(id);
+            var schedule = FindSchedule(id);
             if (schedule is null)
                 return null;
 
@@ -135,10 +136,10 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> Schedule -> Delete -> {id}", id);
 
-            if (!this.CheckUserAuth())
+            if (!CheckUserAuth())
                 return Unauthorized();
 
-            var schedule = this.FindSchedule(id);
+            var schedule = FindSchedule(id);
             if (schedule is null)
                 return BadRequest();
 

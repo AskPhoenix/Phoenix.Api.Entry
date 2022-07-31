@@ -1,5 +1,6 @@
 ﻿namespace Phoenix.Api.Entry.Controllers
 {
+    [ApiExplorerSettings(GroupName = "2a")]
     public class BookController : EntryController<Book, BookApi>
     {
         private readonly BookRepository _bookRepository;
@@ -30,7 +31,7 @@
         {
             _logger.LogInformation("Entry -> Book -> Get");
 
-            return this.PhoenixUser?
+            return PhoenixUser?
                 .Schools
                 .SelectMany(s => s.Courses)
                 .SelectMany(c => c.Books)
@@ -42,7 +43,7 @@
         {
             _logger.LogInformation("Entry -> Book -> Get -> {id}", id);
 
-            var book = this.FindBook(id);
+            var book = FindBook(id);
             if (book is null)
                 return null;
 
@@ -54,7 +55,7 @@
         {
             _logger.LogInformation("Entry -> Book -> Get -> Courses -> {id}", id);
 
-            var book = this.FindBook(id);
+            var book = FindBook(id);
             if (book is null)
                 return null;
 
@@ -67,7 +68,7 @@
         {
             _logger.LogInformation("Entry -> Book -> Put -> {id}", id);
 
-            var book = this.FindBook(id);
+            var book = FindBook(id);
             if (book is null)
                 return null;
 
@@ -81,7 +82,7 @@
         {
             _logger.LogInformation("Entry -> Book -> Put -> Courses -> {id}", id);
 
-            var book = this.FindBook(id);
+            var book = FindBook(id);
             if (book is null)
                 return null;
 
@@ -90,7 +91,7 @@
             Course? course;
             foreach (var courseId in courseIds)
             {
-                course = this.FindCourse(courseId);
+                course = FindCourse(courseId);
                 if (course is null)
                     continue;
 
@@ -107,10 +108,10 @@
         {
             _logger.LogInformation("Entry -> Book -> Delete -> {id}", id);
 
-            if (!this.CheckUserAuth())
+            if (!CheckUserAuth())
                 return Unauthorized();
 
-            var book = this.FindBook(id);
+            var book = FindBook(id);
             if (book is null)
                 return BadRequest();
 

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Phoenix.Api.Entry.Controllers
 {
+    [ApiExplorerSettings(GroupName = "1b")]
     public class SchoolConnectionController : ApplicationController
     {
         private readonly SchoolConnectionRepository _schoolConnectionRepository;
@@ -29,7 +30,7 @@ namespace Phoenix.Api.Entry.Controllers
             if (string.IsNullOrWhiteSpace(key))
                 return null;
 
-            var school = this.FindSchool(school_id);
+            var school = FindSchool(school_id);
             if (school is null)
                 return null;
 
@@ -39,7 +40,7 @@ namespace Phoenix.Api.Entry.Controllers
                 connection = await _schoolConnectionRepository
                     .RegisterAsync(ChannelProvider.Facebook, key, school_id, activate);
             }
-            catch(InvalidOperationException) 
+            catch (InvalidOperationException)
             {
                 return null;
             }
@@ -61,7 +62,7 @@ namespace Phoenix.Api.Entry.Controllers
             if (connection is null)
                 return null;
 
-            var school = this.FindSchool(connection.TenantId);
+            var school = FindSchool(connection.TenantId);
             if (school is null)
                 return null;
 
@@ -86,7 +87,7 @@ namespace Phoenix.Api.Entry.Controllers
                 if (connection is null)
                     return null;
 
-                school = this.FindSchool(connection.TenantId);
+                school = FindSchool(connection.TenantId);
                 if (school is null)
                     return null;
 
@@ -119,7 +120,7 @@ namespace Phoenix.Api.Entry.Controllers
                 if (connection is null)
                     return null;
 
-                school = this.FindSchool(connection.TenantId);
+                school = FindSchool(connection.TenantId);
                 if (school is null)
                     return null;
 
@@ -148,7 +149,7 @@ namespace Phoenix.Api.Entry.Controllers
             if (connection is null)
                 return BadRequest();
 
-            var school = this.FindSchool(connection.TenantId);
+            var school = FindSchool(connection.TenantId);
             if (school is null)
                 return BadRequest();
 

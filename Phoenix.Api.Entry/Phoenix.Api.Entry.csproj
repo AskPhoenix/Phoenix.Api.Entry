@@ -25,11 +25,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Microsoft.AspNetCore.Mvc"/>
-	<Using Include="Phoenix.DataHandle.Api.Models"/>
-	<Using Include="Phoenix.DataHandle.Identity"/>
-	<Using Include="Phoenix.DataHandle.Main.Models"/>
-	<Using Include="Phoenix.DataHandle.Repositories"/>
+    <Using Include="Microsoft.AspNetCore.Mvc" />
+	<Using Include="Phoenix.DataHandle.Api.Models" />
+	<Using Include="Phoenix.DataHandle.Identity" />
+	<Using Include="Phoenix.DataHandle.Main.Models" />
+	<Using Include="Phoenix.DataHandle.Repositories" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,6 @@
 ﻿namespace Phoenix.Api.Entry.Controllers
 {
+    [ApiExplorerSettings(GroupName = "2b")]
     public class CourseController : EntryController<Course, CourseApi>
     {
         private readonly CourseRepository _courseRepository;
@@ -21,7 +22,7 @@
             if (course.LastDate < course.FirstDate)
                 return false;
 
-            if (this.FindSchool(course.SchoolId) is null)
+            if (FindSchool(course.SchoolId) is null)
                 return false;
 
             return true;
@@ -32,7 +33,7 @@
         {
             _logger.LogInformation("Entry -> Course -> Post");
 
-            var school = this.FindSchool(courseApi.SchoolId);
+            var school = FindSchool(courseApi.SchoolId);
 
             var course = courseApi.ToCourse();
             course.Id = 0;
@@ -55,7 +56,7 @@
         {
             _logger.LogInformation("Entry -> Course -> Get");
 
-            return this.PhoenixUser?
+            return PhoenixUser?
                 .Schools
                 .SelectMany(s => s.Courses)
                 .Select(c => new CourseApi(c));
@@ -66,7 +67,7 @@
         {
             _logger.LogInformation("Entry -> Course -> Get -> {id}", id);
 
-            var course = this.FindCourse(id);
+            var course = FindCourse(id);
             if (course is null)
                 return null;
 
@@ -78,7 +79,7 @@
         {
             _logger.LogInformation("Entry -> Course -> Get -> Books -> {id}", id);
 
-            var course = this.FindCourse(id);
+            var course = FindCourse(id);
             if (course is null)
                 return null;
 
@@ -91,7 +92,7 @@
         {
             _logger.LogInformation("Entry -> Course -> Get -> Lectures -> {id}", id);
 
-            var course = this.FindCourse(id);
+            var course = FindCourse(id);
             if (course is null)
                 return null;
 
@@ -104,7 +105,7 @@
         {
             _logger.LogInformation("Entry -> Course -> Get -> Schedules -> {id}", id);
 
-            var course = this.FindCourse(id);
+            var course = FindCourse(id);
             if (course is null)
                 return null;
 
@@ -117,7 +118,7 @@
         {
             _logger.LogInformation("Entry -> Course -> Get -> Users -> {id}", id);
 
-            var course = this.FindCourse(id);
+            var course = FindCourse(id);
             if (course is null)
                 return null;
 
@@ -140,7 +141,7 @@
         {
             _logger.LogInformation("Entry -> Course -> Put -> {id}", id);
 
-            var course = this.FindCourse(id);
+            var course = FindCourse(id);
             if (course is null)
                 return null;
 
@@ -159,7 +160,7 @@
         {
             _logger.LogInformation("Entry -> Course -> Put -> Books -> {id}", id);
 
-            var course = this.FindCourse(id);
+            var course = FindCourse(id);
             if (course is null)
                 return null;
 
@@ -168,7 +169,7 @@
             Book? book;
             foreach (var bookId in bookIds)
             {
-                book = this.FindBook(bookId);
+                book = FindBook(bookId);
                 if (book is null)
                     continue;
 
@@ -185,10 +186,10 @@
         {
             _logger.LogInformation("Entry -> Course -> Delete -> {id}", id);
 
-            if (!this.CheckUserAuth())
+            if (!CheckUserAuth())
                 return Unauthorized();
 
-            var course = this.FindCourse(id);
+            var course = FindCourse(id);
             if (course is null)
                 return BadRequest();
 
