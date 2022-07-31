@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Phoenix.DataHandle.Api;
 using Phoenix.DataHandle.Api.Models.Extensions;
-using Phoenix.DataHandle.Main.Models.Extensions;
 
 namespace Phoenix.Api.Entry.Controllers
 {
@@ -9,7 +8,7 @@ namespace Phoenix.Api.Entry.Controllers
     [ApiController]
     [Route("api/[controller]")]
     public abstract class EntryController<TModel, TModelApi> : ApplicationController
-        where TModel : class, IModelEntity
+        where TModel : class
         where TModelApi : class, IModelApi
     {
         protected EntryController(
@@ -20,6 +19,7 @@ namespace Phoenix.Api.Entry.Controllers
         {
         }
 
+        // TODO: Check if unique model already exists in POST
         [HttpPost]
         public abstract Task<TModelApi?> PostAsync([FromBody] TModelApi modelApi);
 
