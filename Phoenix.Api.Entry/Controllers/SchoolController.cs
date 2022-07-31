@@ -57,7 +57,7 @@
             return new SchoolApi(school);
         }
 
-        [HttpGet("connections/{id}")]
+        [HttpGet("{id}/connections")]
         public IEnumerable<SchoolConnectionApi>? GetConnections(int id)
         {
             _logger.LogInformation("Entry -> School -> Get -> Connections -> {id}", id);
@@ -70,7 +70,7 @@
                 .Select(c => new SchoolConnectionApi(c));
         }
 
-        [HttpGet("courses/{id}")]
+        [HttpGet("{id}/courses")]
         public IEnumerable<CourseApi>? GetCourses(int id)
         {
             _logger.LogInformation("Entry -> School -> Get -> Courses -> {id}", id);
@@ -84,7 +84,7 @@
                 .Select(c => new CourseApi(c));
         }
 
-        [HttpGet("classrooms/{id}")]
+        [HttpGet("{id}/classrooms")]
         public IEnumerable<ClassroomApi>? GetClassrooms(int id)
         {
             _logger.LogInformation("Entry -> School -> Get -> Classrooms -> {id}", id);
@@ -98,7 +98,7 @@
                 .Select(c => new ClassroomApi(c));
         }
 
-        [HttpGet("users/{id}")]
+        [HttpGet("{id}/users")]
         public async Task<IEnumerable<AspNetUserApi>?> GetUsersAsync(int id)
         {
             _logger.LogInformation("Entry -> School -> Get -> Users -> {id}", id);

@@ -68,7 +68,7 @@ namespace Phoenix.Api.Entry.Controllers
             return new SchoolConnectionApi(connection);
         }
 
-        [HttpPut("facebook/connect/{key}")]
+        [HttpPut("facebook/{key}/connect")]
         public async Task<SchoolConnectionApi?> FacebookConnectAsync(string key)
         {
             _logger.LogInformation("Entry -> School Connection -> Facebook -> Connect");
@@ -101,7 +101,7 @@ namespace Phoenix.Api.Entry.Controllers
             return new SchoolConnectionApi(connection);
         }
 
-        [HttpPut("facebook/disconnect/{key}")]
+        [HttpPut("facebook/{key}/disconnect")]
         public async Task<SchoolConnectionApi?> FacebookDisconnectAsync(string key)
         {
             _logger.LogInformation("Entry -> School Connection -> Facebook -> Disconnect");

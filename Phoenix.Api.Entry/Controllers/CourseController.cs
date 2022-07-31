@@ -76,7 +76,7 @@
             return new CourseApi(course);
         }
 
-        [HttpGet("books/{id}")]
+        [HttpGet("{id}/books")]
         public IEnumerable<BookApi>? GetBooks(int id)
         {
             _logger.LogInformation("Entry -> Course -> Get -> Books -> {id}", id);
@@ -89,7 +89,7 @@
                 .Select(b => new BookApi(b));
         }
 
-        [HttpGet("lectures/{id}")]
+        [HttpGet("{id}/lectures")]
         public IEnumerable<LectureApi>? GetLectures(int id)
         {
             _logger.LogInformation("Entry -> Course -> Get -> Lectures -> {id}", id);
@@ -102,7 +102,7 @@
                 .Select(l => new LectureApi(l));
         }
 
-        [HttpGet("schedules/{id}")]
+        [HttpGet("{id}/schedules")]
         public IEnumerable<ScheduleApi>? GetSchedules(int id)
         {
             _logger.LogInformation("Entry -> Course -> Get -> Schedules -> {id}", id);
@@ -115,7 +115,7 @@
                 .Select(s => new ScheduleApi(s));
         }
 
-        [HttpGet("users/{id}")]
+        [HttpGet("{id}/users")]
         public async Task<IEnumerable<AspNetUserApi>?> GetUsersAsync(int id)
         {
             _logger.LogInformation("Entry -> Course -> Get -> Users -> {id}", id);
@@ -157,7 +157,7 @@
             return new CourseApi(course);
         }
 
-        [HttpPut("books/{id}")]
+        [HttpPut("{id}/books")]
         public async Task<IEnumerable<BookApi>?> PutBooksAsync(int id, [FromBody] List<int> bookIds)
         {
             _logger.LogInformation("Entry -> Course -> Put -> Books -> {id}", id);

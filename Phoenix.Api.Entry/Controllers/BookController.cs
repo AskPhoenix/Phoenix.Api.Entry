@@ -52,7 +52,7 @@
             return new BookApi(book);
         }
 
-        [HttpGet("courses/{id}")]
+        [HttpGet("{id}/courses")]
         public IEnumerable<CourseApi>? GetCourses(int id)
         {
             _logger.LogInformation("Entry -> Book -> Get -> Courses -> {id}", id);
@@ -79,7 +79,7 @@
             return new BookApi(book);
         }
 
-        [HttpPut("courses/{id}")]
+        [HttpPut("{id}/courses")]
         public async Task<IEnumerable<CourseApi>?> PutCoursesAsync(int id, [FromBody] List<int> courseIds)
         {
             _logger.LogInformation("Entry -> Book -> Put -> Courses -> {id}", id);

@@ -78,7 +78,7 @@ namespace Phoenix.Api.Entry.Controllers
             return new ScheduleApi(schedule);
         }
 
-        [HttpGet("lectures/{id}")]
+        [HttpGet("{id}/lectures")]
         public IEnumerable<LectureApi>? GetLectures(int id)
         {
             _logger.LogInformation("Entry -> Schedule -> Get -> Lectures -> {id}", id);
@@ -110,7 +110,7 @@ namespace Phoenix.Api.Entry.Controllers
             return new ScheduleApi(schedule);
         }
 
-        [HttpPut("lectures/{id}")]
+        [HttpPut("{id}/lectures")]
         public async Task<IEnumerable<LectureApi>?> PutLecturesAsync(int id)
         {
             _logger.LogInformation("Entry -> Schedule -> Put -> Lectures -> {id}", id);
