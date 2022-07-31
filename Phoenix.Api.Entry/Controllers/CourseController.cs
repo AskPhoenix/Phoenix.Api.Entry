@@ -134,9 +134,9 @@
             foreach (var user in users)
             {
                 var appUser = await _userManager.FindByIdAsync(user.AspNetUserId.ToString());
-                var roles = await _userManager.GetRolesAsync(appUser);
+                var roleRanks = await _userManager.GetRoleRanksAsync(appUser);
 
-                tore.Add(new(user, appUser, roles.ToList()));
+                tore.Add(new(user, appUser, roleRanks.ToList()));
             }
 
             return tore;
@@ -189,6 +189,12 @@
             course = await _courseRepository.UpdateAsync(course);
 
             return course.Books.Select(b => new BookApi(b));
+        }
+
+        [HttpPut("{id}/users")]
+        public Task<IEnumerable<ApplicationUserApi>?> PutUsersAsync(int id, [FromBody] List<int> userIds)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
