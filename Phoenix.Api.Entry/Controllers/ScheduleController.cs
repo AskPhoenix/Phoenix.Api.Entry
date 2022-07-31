@@ -15,7 +15,7 @@ namespace Phoenix.Api.Entry.Controllers
             : base(phoenixContext, userManager, logger)
         {
             _scheduleRepository = new(phoenixContext, nonObviatedOnly: true);
-            _lectureRepository = new(phoenixContext);
+            _lectureRepository = new(phoenixContext, nonObviatedOnly: true);
         }
 
         protected override bool Check(IModelEntity model)
@@ -122,15 +122,18 @@ namespace Phoenix.Api.Entry.Controllers
             if (schedule is null)
                 return null;
 
-            // TODO: Check if this deletes the old Lectures, or just sets their ScheduleId property to null
-            schedule.Lectures.Clear();
-
             var lecturesTuple = await EntryHelper.GenerateLecturesAsync(schedule, _lectureRepository);
 
             var lecturesCreated = await _lectureRepository.CreateRangeAsync(lecturesTuple.Item1);
             var lecturesUpdated = await _lectureRepository.UpdateRangeAsync(lecturesTuple.Item2);
 
-            return lecturesCreated.Concat(lecturesUpdated).Select(l => new LectureApi(l));
+            var lecturesFinal = lecturesCreated.Concat(lecturesUpdated);
+
+            // TODO: Check if this translates to SQL
+            var lecturesToDelete = schedule.Lectures.Where(l => !lecturesFinal.Contains(l));
+            await _lectureRepository.DeleteRangeAsync(lecturesToDelete);
+
+            return lecturesFinal.Select(l => new LectureApi(l));
         }
 
         [HttpDelete("{id}")]
