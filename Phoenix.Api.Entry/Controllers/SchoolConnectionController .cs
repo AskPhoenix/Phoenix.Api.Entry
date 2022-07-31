@@ -1,9 +1,10 @@
-﻿using Phoenix.DataHandle.Main.Types;
+﻿using Phoenix.DataHandle.Api;
+using Phoenix.DataHandle.Main.Types;
 using System.ComponentModel.DataAnnotations;
 
 namespace Phoenix.Api.Entry.Controllers
 {
-    public class SchoolConnectionController : EntryController
+    public class SchoolConnectionController : ApplicationController
     {
         private readonly SchoolConnectionRepository _schoolConnectionRepository;
 

@@ -1,6 +1,6 @@
 ﻿namespace Phoenix.Api.Entry.Controllers
 {
-    public class SchoolController : EntryController
+    public class SchoolController : EntryController<School, SchoolApi>
     {
         private readonly SchoolRepository _schoolRepository;
 
@@ -14,7 +14,7 @@
         }
 
         [HttpPost]
-        public async Task<SchoolApi?> PostAsync([FromBody] SchoolApi schoolApi)
+        public override async Task<SchoolApi?> PostAsync([FromBody] SchoolApi schoolApi)
         {
             _logger.LogInformation("Entry -> School -> Post");
 
@@ -36,7 +36,7 @@
         }
 
         [HttpGet]
-        public IEnumerable<SchoolApi>? Get()
+        public override IEnumerable<SchoolApi>? Get()
         {
             _logger.LogInformation("Entry -> School -> Get");
 
@@ -46,7 +46,7 @@
         }
 
         [HttpGet("{id}")]
-        public SchoolApi? Get(int id)
+        public override SchoolApi? Get(int id)
         {
             _logger.LogInformation("Entry -> School -> Get -> {id}", id);
 
@@ -123,7 +123,7 @@
         }
 
         [HttpPut("{id}")]
-        public async Task<SchoolApi?> PutAsync(int id, [FromBody] SchoolApi schoolApi)
+        public override async Task<SchoolApi?> PutAsync(int id, [FromBody] SchoolApi schoolApi)
         {
             _logger.LogInformation("Entry -> School -> Put -> {id}", id);
 
@@ -138,7 +138,7 @@
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync(int id)
+        public override async Task<IActionResult> DeleteAsync(int id)
         {
             _logger.LogInformation("Entry -> School -> Delete -> {id}", id);
 

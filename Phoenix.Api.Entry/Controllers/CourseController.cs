@@ -1,8 +1,6 @@
-﻿using Phoenix.DataHandle.Main.Models.Extensions;
-
-namespace Phoenix.Api.Entry.Controllers
+﻿namespace Phoenix.Api.Entry.Controllers
 {
-    public class CourseController : EntryController
+    public class CourseController : EntryController<Course, CourseApi>
     {
         private readonly CourseRepository _courseRepository;
 
@@ -15,10 +13,8 @@ namespace Phoenix.Api.Entry.Controllers
             _courseRepository = new(phoenixContext, nonObviatedOnly: true);
         }
 
-        protected override bool Check(IModelEntity model)
+        protected override bool Check(Course course)
         {
-            var course = model as Course;
-
             if (course is null)
                 return false;
 
@@ -32,7 +28,7 @@ namespace Phoenix.Api.Entry.Controllers
         }
 
         [HttpPost]
-        public async Task<CourseApi?> PostAsync([FromBody] CourseApi courseApi)
+        public override async Task<CourseApi?> PostAsync([FromBody] CourseApi courseApi)
         {
             _logger.LogInformation("Entry -> Course -> Post");
 
@@ -58,7 +54,7 @@ namespace Phoenix.Api.Entry.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<CourseApi>? Get()
+        public override IEnumerable<CourseApi>? Get()
         {
             _logger.LogInformation("Entry -> Course -> Get");
 
@@ -69,7 +65,7 @@ namespace Phoenix.Api.Entry.Controllers
         }
 
         [HttpGet("{id}")]
-        public CourseApi? Get(int id)
+        public override CourseApi? Get(int id)
         {
             _logger.LogInformation("Entry -> Course -> Get -> {id}", id);
 
@@ -143,7 +139,7 @@ namespace Phoenix.Api.Entry.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<CourseApi?> PutAsync(int id, [FromBody] CourseApi courseApi)
+        public override async Task<CourseApi?> PutAsync(int id, [FromBody] CourseApi courseApi)
         {
             _logger.LogInformation("Entry -> Course -> Put -> {id}", id);
 
@@ -188,7 +184,7 @@ namespace Phoenix.Api.Entry.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync(int id)
+        public override async Task<IActionResult> DeleteAsync(int id)
         {
             _logger.LogInformation("Entry -> Course -> Delete -> {id}", id);
 

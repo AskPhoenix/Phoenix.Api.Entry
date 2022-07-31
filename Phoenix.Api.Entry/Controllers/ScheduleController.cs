@@ -1,9 +1,8 @@
 ﻿using Phoenix.DataHandle.DataEntry;
-using Phoenix.DataHandle.Main.Models.Extensions;
 
 namespace Phoenix.Api.Entry.Controllers
 {
-    public class ScheduleController : EntryController
+    public class ScheduleController : EntryController<Schedule, ScheduleApi>
     {
         private readonly ScheduleRepository _scheduleRepository;
         private readonly LectureRepository _lectureRepository;
@@ -18,10 +17,8 @@ namespace Phoenix.Api.Entry.Controllers
             _lectureRepository = new(phoenixContext, nonObviatedOnly: true);
         }
 
-        protected override bool Check(IModelEntity model)
+        protected override bool Check(Schedule schedule)
         {
-            var schedule = model as Schedule;
-
             if (schedule is null)
                 return false;
 
@@ -39,7 +36,7 @@ namespace Phoenix.Api.Entry.Controllers
         }
 
         [HttpPost]
-        public async Task<ScheduleApi?> PostAsync([FromBody] ScheduleApi scheduleApi)
+        public override async Task<ScheduleApi?> PostAsync([FromBody] ScheduleApi scheduleApi)
         {
             _logger.LogInformation("Entry -> Schedule -> Post");
 
@@ -58,7 +55,7 @@ namespace Phoenix.Api.Entry.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<ScheduleApi>? Get()
+        public override IEnumerable<ScheduleApi>? Get()
         {
             _logger.LogInformation("Entry -> Schedule -> Get");
 
@@ -70,7 +67,7 @@ namespace Phoenix.Api.Entry.Controllers
         }
 
         [HttpGet("{id}")]
-        public ScheduleApi? Get(int id)
+        public override ScheduleApi? Get(int id)
         {
             _logger.LogInformation("Entry -> Schedule -> Get -> {id}", id);
 
@@ -95,7 +92,7 @@ namespace Phoenix.Api.Entry.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ScheduleApi?> PutAsync(int id, [FromBody] ScheduleApi scheduleApi)
+        public override async Task<ScheduleApi?> PutAsync(int id, [FromBody] ScheduleApi scheduleApi)
         {
             _logger.LogInformation("Entry -> Schedule -> Put -> {id}", id);
 
@@ -137,7 +134,7 @@ namespace Phoenix.Api.Entry.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync(int id)
+        public override async Task<IActionResult> DeleteAsync(int id)
         {
             _logger.LogInformation("Entry -> Schedule -> Delete -> {id}", id);
 
