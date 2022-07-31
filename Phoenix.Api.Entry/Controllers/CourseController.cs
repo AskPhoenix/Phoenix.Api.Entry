@@ -28,6 +28,8 @@
             return true;
         }
 
+        #region POST
+
         [HttpPost]
         public override async Task<CourseApi?> PostAsync([FromBody] CourseApi courseApi)
         {
@@ -50,6 +52,10 @@
 
             return new CourseApi(course);
         }
+
+        #endregion
+
+        #region GET
 
         [HttpGet]
         public override IEnumerable<CourseApi>? Get()
@@ -136,6 +142,10 @@
             return tore;
         }
 
+        #endregion
+
+        #region PUT
+
         [HttpPut("{id}")]
         public override async Task<CourseApi?> PutAsync(int id, [FromBody] CourseApi courseApi)
         {
@@ -181,6 +191,10 @@
             return course.Books.Select(b => new BookApi(b));
         }
 
+        #endregion
+
+        #region DELETE
+
         [HttpDelete("{id}")]
         public override async Task<IActionResult> DeleteAsync(int id)
         {
@@ -197,5 +211,7 @@
 
             return Ok();
         }
+
+        #endregion
     }
 }

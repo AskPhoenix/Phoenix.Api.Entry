@@ -14,6 +14,8 @@
             _schoolRepository = new(phoenixContext, nonObviatedOnly: true);
         }
 
+        #region POST
+
         [HttpPost]
         public override async Task<SchoolApi?> PostAsync([FromBody] SchoolApi schoolApi)
         {
@@ -35,6 +37,10 @@
 
             return new SchoolApi(school);
         }
+
+        #endregion
+
+        #region GET
 
         [HttpGet]
         public override IEnumerable<SchoolApi>? Get()
@@ -123,6 +129,10 @@
             return tore;
         }
 
+        #endregion
+
+        #region PUT
+
         [HttpPut("{id}")]
         public override async Task<SchoolApi?> PutAsync(int id, [FromBody] SchoolApi schoolApi)
         {
@@ -137,6 +147,10 @@
 
             return new SchoolApi(school);
         }
+
+        #endregion
+
+        #region DELETE
 
         [HttpDelete("{id}")]
         public override async Task<IActionResult> DeleteAsync(int id)
@@ -154,5 +168,7 @@
 
             return Ok();
         }
+
+        #endregion
     }
 }

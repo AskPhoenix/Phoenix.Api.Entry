@@ -24,6 +24,7 @@
 
             return true;
         }
+        #region POST
 
         [HttpPost]
         public override async Task<ClassroomApi?> PostAsync([FromBody] ClassroomApi classroomApi)
@@ -40,6 +41,10 @@
 
             return new ClassroomApi(classroom);
         }
+
+        #endregion
+
+        #region GET
 
         [HttpGet]
         public override IEnumerable<ClassroomApi>? Get()
@@ -90,6 +95,10 @@
                 .Select(s => new ScheduleApi(s));
         }
 
+        #endregion
+
+        #region PUT
+
         [HttpPut("{id}")]
         public override async Task<ClassroomApi?> PutAsync(int id, [FromBody] ClassroomApi classroomApi)
         {
@@ -109,6 +118,10 @@
             return new ClassroomApi(classroom);
         }
 
+        #endregion
+
+        #region DELETE
+
         [HttpDelete("{id}")]
         public override async Task<IActionResult> DeleteAsync(int id)
         {
@@ -125,5 +138,7 @@
 
             return Ok();
         }
+
+        #endregion
     }
 }

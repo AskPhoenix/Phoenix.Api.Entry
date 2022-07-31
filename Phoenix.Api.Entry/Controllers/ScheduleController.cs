@@ -36,6 +36,8 @@ namespace Phoenix.Api.Entry.Controllers
             return true;
         }
 
+        #region POST
+
         [HttpPost]
         public override async Task<ScheduleApi?> PostAsync([FromBody] ScheduleApi scheduleApi)
         {
@@ -51,6 +53,10 @@ namespace Phoenix.Api.Entry.Controllers
 
             return new ScheduleApi(schedule);
         }
+
+        #endregion
+
+        #region GET
 
         [HttpGet]
         public override IEnumerable<ScheduleApi>? Get()
@@ -88,6 +94,10 @@ namespace Phoenix.Api.Entry.Controllers
             return schedule.Lectures
                 .Select(l => new LectureApi(l));
         }
+
+        #endregion
+
+        #region PUT
 
         [HttpPut("{id}")]
         public override async Task<ScheduleApi?> PutAsync(int id, [FromBody] ScheduleApi scheduleApi)
@@ -131,6 +141,10 @@ namespace Phoenix.Api.Entry.Controllers
             return lecturesFinal.Select(l => new LectureApi(l));
         }
 
+        #endregion
+
+        #region DELETE
+
         [HttpDelete("{id}")]
         public override async Task<IActionResult> DeleteAsync(int id)
         {
@@ -147,5 +161,7 @@ namespace Phoenix.Api.Entry.Controllers
 
             return Ok();
         }
+
+        #endregion
     }
 }

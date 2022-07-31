@@ -1,9 +1,13 @@
-﻿using Phoenix.DataHandle.Api;
+﻿using Microsoft.AspNetCore.Authorization;
+using Phoenix.DataHandle.Api;
 using Phoenix.DataHandle.Main.Types;
 using System.ComponentModel.DataAnnotations;
 
 namespace Phoenix.Api.Entry.Controllers
 {
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    [ApiController]
+    [Route("api/[controller]")]
     [ApiExplorerSettings(GroupName = "1b")]
     public class SchoolConnectionController : ApplicationController
     {
@@ -17,6 +21,8 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _schoolConnectionRepository = new(phoenixContext);
         }
+
+        #region Facebook POST
 
         [HttpPost("facebook/{key}")]
         public async Task<SchoolConnectionApi?> FacebookRegisterAsync(
@@ -48,6 +54,10 @@ namespace Phoenix.Api.Entry.Controllers
             return new SchoolConnectionApi(connection);
         }
 
+        #endregion
+
+        #region Facebook GET
+
         [HttpGet("facebook/{key}")]
         public async Task<SchoolConnectionApi?> FacebookGetAsync(string key)
         {
@@ -68,6 +78,10 @@ namespace Phoenix.Api.Entry.Controllers
 
             return new SchoolConnectionApi(connection);
         }
+
+        #endregion
+
+        #region Facebook PUT
 
         [HttpPut("facebook/{key}/connect")]
         public async Task<SchoolConnectionApi?> FacebookConnectAsync(string key)
@@ -135,6 +149,10 @@ namespace Phoenix.Api.Entry.Controllers
             return new SchoolConnectionApi(connection);
         }
 
+        #endregion
+
+        #region Facebook DELETE
+
         [HttpDelete("facebook/{key}")]
         public async Task<IActionResult> FacebookDeleteAsync(string key)
         {
@@ -157,5 +175,7 @@ namespace Phoenix.Api.Entry.Controllers
 
             return Ok();
         }
+
+        #endregion
     }
 }

@@ -13,6 +13,8 @@
             _bookRepository = new(phoenixContext);
         }
 
+        #region POST
+
         [HttpPost]
         public override async Task<BookApi?> PostAsync([FromBody] BookApi bookApi)
         {
@@ -25,6 +27,10 @@
 
             return new BookApi(book);
         }
+
+        #endregion
+
+        #region GET
 
         [HttpGet]
         public override IEnumerable<BookApi>? Get()
@@ -62,6 +68,10 @@
             return book.Courses
                 .Select(c => new CourseApi(c));
         }
+
+        #endregion
+
+        #region PUT
 
         [HttpPut("{id}")]
         public override async Task<BookApi?> PutAsync(int id, [FromBody] BookApi bookApi)
@@ -103,6 +113,10 @@
             return book.Courses.Select(c => new CourseApi(c));
         }
 
+        #endregion
+
+        #region DELETE
+
         [HttpDelete("{id}")]
         public override async Task<IActionResult> DeleteAsync(int id)
         {
@@ -119,5 +133,7 @@
 
             return Ok();
         }
+
+        #endregion
     }
 }
