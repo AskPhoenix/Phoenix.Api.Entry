@@ -2,6 +2,7 @@
 using Phoenix.DataHandle.Api.Models;
 using Phoenix.DataHandle.Identity;
 using Phoenix.DataHandle.Main.Models;
+using Phoenix.DataHandle.Main.Models.Extensions;
 using Phoenix.DataHandle.Repositories;
 
 namespace Phoenix.Api.Entry.Controllers
@@ -19,6 +20,22 @@ namespace Phoenix.Api.Entry.Controllers
             _courseRepository = new(phoenixContext, nonObviatedOnly: true);
         }
 
+        protected override bool Check(IModelEntity model)
+        {
+            var course = model as Course;
+
+            if (course is null)
+                return false;
+
+            if (course.LastDate < course.FirstDate)
+                return false;
+
+            if (this.FindSchool(course.SchoolId) is null)
+                return false;
+
+            return true;
+        }
+
         [HttpPost]
         public async Task<CourseApi?> PostAsync([FromBody] CourseApi courseApi)
         {
@@ -27,21 +44,19 @@ namespace Phoenix.Api.Entry.Controllers
             if (!this.CheckUserAuth())
                 return null;
 
-            if (courseApi.LastDate < courseApi.FirstDate)
-                return null;
-
             var school = this.FindSchool(courseApi.SchoolId);
-            if (school is null)
-                return null;
 
             var course = courseApi.ToCourse();
             course.Id = 0;
             course.Code = 0;
             //course.Users.Add(this.PhoenixUser!);
 
+            if (!Check(course))
+                return null;
+
             course = await _courseRepository.CreateAsync(course);
 
-            course.Code = (short)school.Courses.Count;
+            course.Code = (short)school!.Courses.Count;
             course = await _courseRepository.UpdateAsync(course);
 
             return new CourseApi(course);
@@ -141,7 +156,12 @@ namespace Phoenix.Api.Entry.Controllers
             if (course is null)
                 return null;
 
-            course = await _courseRepository.UpdateAsync(courseApi.ToCourse(course));
+            course = courseApi.ToCourse(course);
+
+            if (!Check(course))
+                return null;
+
+            course = await _courseRepository.UpdateAsync(course);
 
             return new CourseApi(course);
         }

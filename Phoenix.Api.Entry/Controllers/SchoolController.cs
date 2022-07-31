@@ -9,17 +9,14 @@ namespace Phoenix.Api.Entry.Controllers
     public class SchoolController : EntryController
     {
         private readonly SchoolRepository _schoolRepository;
-        private readonly ApplicationStore _appStore;
 
         public SchoolController(
             PhoenixContext phoenixContext,
             ApplicationUserManager userManager,
-            ILogger<SchoolController> logger,
-            ApplicationStore appStore)
+            ILogger<SchoolController> logger)
             : base(phoenixContext, userManager, logger)
         {
             _schoolRepository = new(phoenixContext, nonObviatedOnly: true);
-            _appStore = appStore;
         }
 
         [HttpPost]
@@ -140,6 +137,7 @@ namespace Phoenix.Api.Entry.Controllers
             if (school is null)
                 return null;
 
+            // TODO: Ensure that this update does not empty the collections
             school = await _schoolRepository.UpdateAsync(schoolApi.ToSchool(school));
 
             return new SchoolApi(school);

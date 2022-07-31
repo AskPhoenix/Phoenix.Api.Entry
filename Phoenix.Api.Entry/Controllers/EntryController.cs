@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Phoenix.DataHandle.Api;
 using Phoenix.DataHandle.Identity;
 using Phoenix.DataHandle.Main.Models;
+using Phoenix.DataHandle.Main.Models.Extensions;
 
 namespace Phoenix.Api.Entry.Controllers
 {
@@ -17,6 +18,11 @@ namespace Phoenix.Api.Entry.Controllers
             ILogger<EntryController> logger)
             : base(phoenixContext, userManager, logger)
         {
+        }
+
+        protected virtual bool Check(IModelEntity model)
+        {
+            return model is not null;
         }
 
         protected Course? FindCourse(int courseId)
@@ -40,6 +46,13 @@ namespace Phoenix.Api.Entry.Controllers
                 .SelectMany(s => s.Courses)
                 .SelectMany(c => c.Schedules)
                 .SingleOrDefault(s => s.Id == scheduleId);
+        }
+
+        protected Classroom? FindClassroom(int classroomId)
+        {
+            return this.PhoenixUser?.Schools
+                .SelectMany(s => s.Classrooms)
+                .SingleOrDefault(c => c.Id == classroomId);
         }
     }
 }

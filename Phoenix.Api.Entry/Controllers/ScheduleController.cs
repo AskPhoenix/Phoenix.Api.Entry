@@ -3,6 +3,7 @@ using Phoenix.DataHandle.Api.Models;
 using Phoenix.DataHandle.DataEntry;
 using Phoenix.DataHandle.Identity;
 using Phoenix.DataHandle.Main.Models;
+using Phoenix.DataHandle.Main.Models.Extensions;
 using Phoenix.DataHandle.Repositories;
 
 namespace Phoenix.Api.Entry.Controllers
@@ -22,6 +23,26 @@ namespace Phoenix.Api.Entry.Controllers
             _lectureRepository = new(phoenixContext);
         }
 
+        protected override bool Check(IModelEntity model)
+        {
+            var schedule = model as Schedule;
+
+            if (schedule is null)
+                return false;
+
+            if (schedule.EndTime < schedule.StartTime)
+                return false;
+
+            if (this.FindCourse(schedule.CourseId) is null)
+                return false;
+
+            if (schedule.ClassroomId.HasValue)
+                if (this.FindClassroom(schedule.ClassroomId.Value) is null)
+                    schedule.ClassroomId = null;
+
+            return true;
+        }
+
         [HttpPost]
         public async Task<ScheduleApi?> PostAsync([FromBody] ScheduleApi scheduleApi)
         {
@@ -30,15 +51,11 @@ namespace Phoenix.Api.Entry.Controllers
             if (!this.CheckUserAuth())
                 return null;
 
-            if (scheduleApi.EndTime < scheduleApi.StartTime)
-                return null;
-
-            var course = this.FindCourse(scheduleApi.CourseId);
-            if (course is null)
-                return null;
-
             var schedule = scheduleApi.ToSchedule();
             schedule.Id = 0;
+
+            if (!Check(schedule))
+                return null;
 
             schedule = await _scheduleRepository.CreateAsync(schedule);
 
@@ -91,7 +108,12 @@ namespace Phoenix.Api.Entry.Controllers
             if (schedule is null)
                 return null;
 
-            schedule = await _scheduleRepository.UpdateAsync(scheduleApi.ToSchedule(schedule));
+            schedule = scheduleApi.ToSchedule(schedule);
+           
+            if (!Check(schedule))
+                return null;
+
+            schedule = await _scheduleRepository.UpdateAsync(schedule);
 
             return new ScheduleApi(schedule);
         }

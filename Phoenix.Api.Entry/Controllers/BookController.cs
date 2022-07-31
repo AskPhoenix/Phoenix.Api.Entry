@@ -19,7 +19,7 @@ namespace Phoenix.Api.Entry.Controllers
         }
 
         [HttpPost]
-        public async Task<BookApi?> PostAsync([FromBody] BookApi bookApi, int courseId)
+        public async Task<BookApi?> PostAsync([FromBody] BookApi bookApi)
         {
             _logger.LogInformation("Entry -> Book -> Post");
 
