@@ -33,5 +33,13 @@ namespace Phoenix.Api.Entry.Controllers
                 .SelectMany(c => c.Books)
                 .SingleOrDefault(b => b.Id == bookId);
         }
+
+        protected Schedule? FindSchedule(int scheduleId)
+        {
+            return this.PhoenixUser?.Schools
+                .SelectMany(s => s.Courses)
+                .SelectMany(c => c.Schedules)
+                .SingleOrDefault(s => s.Id == scheduleId);
+        }
     }
 }
