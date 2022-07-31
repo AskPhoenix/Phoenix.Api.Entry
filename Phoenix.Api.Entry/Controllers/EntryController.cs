@@ -38,7 +38,7 @@ namespace Phoenix.Api.Entry.Controllers
 
         protected virtual bool Check(TModel model)
         {
-            return model is not null;
+            return this.CheckUserAuth() && model is not null;
         }
 
         protected Course? FindCourse(int courseId)
@@ -69,6 +69,14 @@ namespace Phoenix.Api.Entry.Controllers
             return this.PhoenixUser?.Schools
                 .SelectMany(s => s.Classrooms)
                 .SingleOrDefault(c => c.Id == classroomId);
+        }
+
+        protected Lecture? FindLecture(int lectureId)
+        {
+            return this.PhoenixUser?.Schools
+                .SelectMany(s => s.Courses)
+                .SelectMany(c => c.Lectures)
+                .SingleOrDefault(l => l.Id == lectureId);
         }
     }
 }

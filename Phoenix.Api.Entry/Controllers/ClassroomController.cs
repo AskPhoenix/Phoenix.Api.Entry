@@ -29,9 +29,6 @@
         {
             _logger.LogInformation("Entry -> Classroom -> Post");
 
-            if (!this.CheckUserAuth())
-                return null;
-
             var classroom = classroomApi.ToClassroom();
             classroom.Id = 0;
 

@@ -40,9 +40,6 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> Schedule -> Post");
 
-            if (!this.CheckUserAuth())
-                return null;
-
             var schedule = scheduleApi.ToSchedule();
             schedule.Id = 0;
 

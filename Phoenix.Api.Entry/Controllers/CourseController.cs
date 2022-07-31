@@ -32,9 +32,6 @@
         {
             _logger.LogInformation("Entry -> Course -> Post");
 
-            if (!this.CheckUserAuth())
-                return null;
-
             var school = this.FindSchool(courseApi.SchoolId);
 
             var course = courseApi.ToCourse();

@@ -17,9 +17,6 @@
         {
             _logger.LogInformation("Entry -> Book -> Post");
 
-            if (!this.CheckUserAuth())
-                return null;
-
             var book = bookApi.ToBook();
             book.Id = 0;
 

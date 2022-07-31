@@ -61,7 +61,6 @@ builder.Services.AddSwaggerGen(o =>
         Version = "3.0"
     });
 
-
     var jwtSecurityScheme = new OpenApiSecurityScheme
     {
         Scheme = "bearer",
@@ -77,6 +76,7 @@ builder.Services.AddSwaggerGen(o =>
             Type = ReferenceType.SecurityScheme
         }
     };
+
     o.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
 
     o.AddSecurityRequirement(new OpenApiSecurityRequirement
