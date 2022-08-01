@@ -12,7 +12,7 @@ namespace Phoenix.Api.Entry.Controllers
         {
         }
 
-        protected async Task<IEnumerable<ApplicationUserApi>?> GetApplicationUsersAsync(IEnumerable<User> users)
+        protected async Task<IEnumerable<ApplicationUserApi>> GetApplicationUsersAsync(IEnumerable<User> users)
         {
             if (users is null)
                 throw new ArgumentNullException(nameof(users));
@@ -29,6 +29,20 @@ namespace Phoenix.Api.Entry.Controllers
             }
 
             return tore;
+        }
+
+        protected Course? FindCourse(int courseId)
+        {
+            return this.PhoenixUser?.Schools
+                .SelectMany(s => s.Courses)
+                .SingleOrDefault(c => c.Id == courseId);
+        }
+
+        protected User? FindUser(int userId)
+        {
+            return this.PhoenixUser?.Schools
+                .SelectMany(s => s.Users)
+                .SingleOrDefault(u => u.AspNetUserId == userId);
         }
     }
 }

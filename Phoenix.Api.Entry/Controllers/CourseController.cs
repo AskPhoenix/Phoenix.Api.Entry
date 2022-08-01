@@ -177,9 +177,30 @@
         }
 
         [HttpPut("{id}/users")]
-        public Task<IEnumerable<ApplicationUserApi>?> PutUsersAsync(int id, [FromBody] List<int> userIds)
+        public async Task<IEnumerable<ApplicationUserApi>?> PutUsersAsync(int id,
+            [FromBody] List<int> userIds)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation("Entry -> Course -> Put -> Users -> {id}", id);
+
+            var course = FindCourse(id);
+            if (course is null)
+                return null;
+
+            course.Users.Clear();
+
+            User? user;
+            foreach (var userId in userIds)
+            {
+                user = this.FindUser(userId);
+                if (user is null)
+                    continue;
+
+                course.Users.Add(user);
+            }
+
+            course = await _courseRepository.UpdateAsync(course);
+
+            return await this.GetApplicationUsersAsync(course.Users);
         }
 
         #endregion

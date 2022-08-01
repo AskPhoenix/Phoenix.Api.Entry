@@ -40,13 +40,6 @@ namespace Phoenix.Api.Entry.Controllers
             return this.CheckUserAuth() && model is not null;
         }
 
-        protected Course? FindCourse(int courseId)
-        {
-            return this.PhoenixUser?.Schools
-                .SelectMany(s => s.Courses)
-                .SingleOrDefault(c => c.Id == courseId);
-        }
-
         protected Book? FindBook(int bookId)
         {
             return this.PhoenixUser?.Schools
