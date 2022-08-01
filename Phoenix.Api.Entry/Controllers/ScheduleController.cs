@@ -3,7 +3,7 @@
 namespace Phoenix.Api.Entry.Controllers
 {
     [ApiExplorerSettings(GroupName = "3b")]
-    public class ScheduleController : EntryController<Schedule, ScheduleApi>
+    public class ScheduleController : DataEntryController<Schedule, ScheduleApi>
     {
         private readonly ScheduleRepository _scheduleRepository;
         private readonly LectureRepository _lectureRepository;

@@ -1,82 +1,34 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Phoenix.DataHandle.Api;
-using Phoenix.DataHandle.Api.Models.Extensions;
+﻿using Phoenix.DataHandle.Api;
 
 namespace Phoenix.Api.Entry.Controllers
 {
-    [Authorize(AuthenticationSchemes = "Bearer")]
-    [ApiController]
-    [Route("api/[controller]")]
-    public abstract class EntryController<TModel, TModelApi> : ApplicationController
-        where TModel : class
-        where TModelApi : class, IModelApi
+    public class EntryController : ApplicationController
     {
-        protected EntryController(
+        public EntryController(
             PhoenixContext phoenixContext,
             ApplicationUserManager userManager,
-            ILogger<EntryController<TModel, TModelApi>> logger)
+            ILogger<EntryController> logger)
             : base(phoenixContext, userManager, logger)
         {
         }
 
-        // TODO: Check if unique model already exists in POST
-        [HttpPost]
-        public abstract Task<TModelApi?> PostAsync([FromBody] TModelApi modelApi);
-
-        [HttpGet]
-        public abstract IEnumerable<TModelApi>? Get();
-
-        [HttpGet("{id}")]
-        public abstract TModelApi? Get(int id);
-
-        [HttpPut("{id}")]
-        public abstract Task<TModelApi?> PutAsync(int id, [FromBody] TModelApi modelApi);
-
-        [HttpDelete("{id}")]
-        public abstract Task<IActionResult> DeleteAsync(int id);
-
-
-        protected virtual bool Check(TModel model)
+        protected async Task<IEnumerable<ApplicationUserApi>?> GetApplicationUsersAsync(IEnumerable<User> users)
         {
-            return this.CheckUserAuth() && model is not null;
-        }
+            if (users is null)
+                throw new ArgumentNullException(nameof(users));
 
-        protected Course? FindCourse(int courseId)
-        {
-            return this.PhoenixUser?.Schools
-                .SelectMany(s => s.Courses)
-                .SingleOrDefault(c => c.Id == courseId);
-        }
+            var nonObviatedUsers = users.Where(u => u.ObviatedAt == null);
 
-        protected Book? FindBook(int bookId)
-        {
-            return this.PhoenixUser?.Schools
-                .SelectMany(s => s.Courses)
-                .SelectMany(c => c.Books)
-                .SingleOrDefault(b => b.Id == bookId);
-        }
+            var tore = new List<ApplicationUserApi>(users.Count());
+            foreach (var user in users)
+            {
+                var appUser = await _userManager.FindByIdAsync(user.AspNetUserId.ToString());
+                var roleRanks = await _userManager.GetRoleRanksAsync(appUser);
 
-        protected Schedule? FindSchedule(int scheduleId)
-        {
-            return this.PhoenixUser?.Schools
-                .SelectMany(s => s.Courses)
-                .SelectMany(c => c.Schedules)
-                .SingleOrDefault(s => s.Id == scheduleId);
-        }
+                tore.Add(new(user, appUser, roleRanks.ToList()));
+            }
 
-        protected Classroom? FindClassroom(int classroomId)
-        {
-            return this.PhoenixUser?.Schools
-                .SelectMany(s => s.Classrooms)
-                .SingleOrDefault(c => c.Id == classroomId);
-        }
-
-        protected Lecture? FindLecture(int lectureId)
-        {
-            return this.PhoenixUser?.Schools
-                .SelectMany(s => s.Courses)
-                .SelectMany(c => c.Lectures)
-                .SingleOrDefault(l => l.Id == lectureId);
+            return tore;
         }
     }
 }

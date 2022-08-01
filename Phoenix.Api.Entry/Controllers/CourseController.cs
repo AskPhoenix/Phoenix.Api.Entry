@@ -1,7 +1,7 @@
 ﻿namespace Phoenix.Api.Entry.Controllers
 {
     [ApiExplorerSettings(GroupName = "2b")]
-    public class CourseController : EntryController<Course, CourseApi>
+    public class CourseController : DataEntryController<Course, CourseApi>
     {
         private readonly CourseRepository _courseRepository;
 
@@ -125,18 +125,7 @@
             if (course is null)
                 return null;
 
-            var users = course.Users.Where(u => u.ObviatedAt == null);
-            var tore = new List<ApplicationUserApi>(users.Count());
-
-            foreach (var user in users)
-            {
-                var appUser = await _userManager.FindByIdAsync(user.AspNetUserId.ToString());
-                var roleRanks = await _userManager.GetRoleRanksAsync(appUser);
-
-                tore.Add(new(user, appUser, roleRanks.ToList()));
-            }
-
-            return tore;
+            return await this.GetApplicationUsersAsync(course.Users);
         }
 
         #endregion

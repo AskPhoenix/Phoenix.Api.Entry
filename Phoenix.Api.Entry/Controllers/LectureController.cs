@@ -4,7 +4,7 @@ namespace Phoenix.Api.Entry.Controllers
 {
     // TODO: Remove from Pavo and use through Egretta
     [ApiExplorerSettings(IgnoreApi = true)]
-    public class LectureController : EntryController<Lecture, LectureApi>
+    public class LectureController : DataEntryController<Lecture, LectureApi>
     {
         private readonly LectureRepository _lectureRepository;
 

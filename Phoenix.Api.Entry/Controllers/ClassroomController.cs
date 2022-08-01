@@ -1,7 +1,7 @@
 ﻿namespace Phoenix.Api.Entry.Controllers
 {
     [ApiExplorerSettings(GroupName = "3a")]
-    public class ClassroomController : EntryController<Classroom, ClassroomApi>
+    public class ClassroomController : DataEntryController<Classroom, ClassroomApi>
     {
         private readonly ClassroomRepository _classroomRepository;
 

@@ -1,7 +1,7 @@
 ﻿namespace Phoenix.Api.Entry.Controllers
 {
     [ApiExplorerSettings(GroupName = "1a")]
-    public class SchoolController : EntryController<School, SchoolApi>
+    public class SchoolController : DataEntryController<School, SchoolApi>
     {
         private readonly SchoolRepository _schoolRepository;
 
@@ -111,19 +111,7 @@
             if (school is null)
                 return null;
 
-            var users = school.Users.Where(u => u.ObviatedAt == null);
-
-            // TODO: Generalize with a method that takes users as argument
-            var tore = new List<ApplicationUserApi>(users.Count());
-            foreach (var user in users)
-            {
-                var appUser = await _userManager.FindByIdAsync(user.AspNetUserId.ToString());
-                var roleRanks = await _userManager.GetRoleRanksAsync(appUser);
-
-                tore.Add(new(user, appUser, roleRanks.ToList()));
-            }
-
-            return tore;
+            return await this.GetApplicationUsersAsync(school.Users);
         }
 
         #endregion

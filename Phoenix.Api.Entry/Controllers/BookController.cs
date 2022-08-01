@@ -1,7 +1,7 @@
 ﻿namespace Phoenix.Api.Entry.Controllers
 {
     [ApiExplorerSettings(GroupName = "2a")]
-    public class BookController : EntryController<Book, BookApi>
+    public class BookController : DataEntryController<Book, BookApi>
     {
         private readonly BookRepository _bookRepository;
         public BookController(
