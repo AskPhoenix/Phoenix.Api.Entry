@@ -17,44 +17,19 @@ namespace Phoenix.Api.Entry.Controllers
 
         #region POST
 
-        public override async Task<ApplicationUserApi?> PostAsync([FromBody] ApplicationUserApi appUserApi,
+        [HttpPost]
+        public async Task<ApplicationUserApi?> PostAsync([FromBody] ApplicationUserApi appUserApi,
             PersonnelRoleRankApi role, [FromQuery, Required] int[] school_ids)
         {
             _logger.LogInformation("Entry -> Personnel -> Post");
 
-            if ((int)role < 0 || (int)role >= RoleExtensions.StaffRoleRanks.Length)
-                return null;
-
-            List<School> schools = new(school_ids.Count());
-            foreach (var schoolId in school_ids)
-            {
-                var school = this.FindSchool(schoolId);
-                if (school is not null)
-                    schools.Add(school);
-            }
-
-            if (!schools.Any())
-                return null;
-
             var roleRank = PersonnelRoleRankApiExtensions.ConvertToRoleRank(role);
 
-            var appUser = appUserApi.ToAppUser();
-            appUser.Id = 0;
-
-            await _userManager.CreateAsync(appUser);
-            await _userManager.AddToRoleAsync(appUser, roleRank.ToNormalizedString());
-
-            var user = appUserApi.User.ToUser();
-            user.AspNetUserId = appUser.Id;
-            user.IsSelfDetermined = true;
-            user.DependenceOrder = 0;
-
-            foreach (var school in schools)
-                user.Schools.Add(school);
-
-            user = await _userRepository.CreateAsync(user);
-
-            return new ApplicationUserApi(user, appUser, new(1) { roleRank });
+            if (string.IsNullOrWhiteSpace(appUserApi.PhoneNumber))
+                return null;
+            
+            return await this.CreateUserAsync(appUserApi,
+                roleRank, depOrder: 0, linkedPhone: appUserApi.PhoneNumber, school_ids);
         }
 
         #endregion
@@ -79,24 +54,11 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> Personnel -> Put -> {id}", id);
 
-            var user = FindUser(id);
-            if (user is null)
+            if (string.IsNullOrWhiteSpace(appUserApi.PhoneNumber))
                 return null;
 
-            var appUser = await _userManager.FindByIdAsync(user.AspNetUserId.ToString());
-
-            user = appUserApi.User.ToUser(user);
-            appUser = appUserApi.ToAppUser(appUser);
-
-            user.IsSelfDetermined = true;
-            user.DependenceOrder = 0;
-
-            user = await _userRepository.UpdateAsync(user);
-            await _userManager.UpdateAsync(appUser);
-
-            var roleRanks = await _userManager.GetRoleRanksAsync(appUser);
-
-            return new ApplicationUserApi(user, appUser, roleRanks.ToList());
+            return await this.UpdateUserAsync(id, appUserApi, 
+                depOrder: 0, linkedPhone: appUserApi.PhoneNumber);
         }
 
         #endregion

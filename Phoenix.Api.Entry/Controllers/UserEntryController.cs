@@ -1,29 +1,22 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using System.ComponentModel.DataAnnotations;
+using Phoenix.DataHandle.Base;
+using Phoenix.DataHandle.Main.Types;
 
 namespace Phoenix.Api.Entry.Controllers
 {
     [Authorize(AuthenticationSchemes = "Bearer")]
     [ApiController]
     [Route("api/[controller]")]
-    public abstract class UserEntryController<TRoleRank> : EntryController
-        where TRoleRank : Enum
+    public abstract class UserEntryController<TRoleRankApi> : EntryController
+        where TRoleRankApi : Enum
     {
         public UserEntryController(
             PhoenixContext phoenixContext,
             ApplicationUserManager userManager,
-            ILogger<UserEntryController<TRoleRank>> logger)
+            ILogger<UserEntryController<TRoleRankApi>> logger)
             : base(phoenixContext, userManager, logger)
         {
         }
-
-        #region POST
-
-        [HttpPost("{role}")]
-        public abstract Task<ApplicationUserApi?> PostAsync([FromBody] ApplicationUserApi appUserApi,
-            TRoleRank role, [FromQuery, Required] int[] school_ids);
-
-        #endregion
 
         #region GET
 
@@ -40,7 +33,7 @@ namespace Phoenix.Api.Entry.Controllers
         }
 
         [HttpGet("{role}")]
-        public abstract Task<IEnumerable<ApplicationUserApi>?> GetAsync(TRoleRank role);
+        public abstract Task<IEnumerable<ApplicationUserApi>?> GetAsync(TRoleRankApi role);
 
         [HttpGet("{id}")]
         public async Task<ApplicationUserApi?> GetAsync(int id)
@@ -139,15 +132,79 @@ namespace Phoenix.Api.Entry.Controllers
 
         #endregion
 
-        protected int CalculateDependanceOrder(User parent)
+        protected List<School>? FindSchools(int[] schoolIds)
         {
-            if (parent is null)
-                throw new ArgumentNullException(nameof(parent));
+            List<School> schools = new(schoolIds.Count());
+            foreach (var schoolId in schoolIds)
+            {
+                var school = this.FindSchool(schoolId);
+                if (school is not null)
+                    schools.Add(school);
+            }
 
-            return parent.Children
-                .Select(c => c.DependenceOrder)
-                .DefaultIfEmpty(0)
-                .Max() + 1;
+            if (!schools.Any())
+                return null;
+
+            return schools;
+        }
+
+        protected virtual async Task<ApplicationUserApi?> CreateUserAsync(ApplicationUserApi appUserApi,
+            RoleRank roleRank, int depOrder, string linkedPhone, int[] school_ids)
+        {
+            if (roleRank == RoleRank.None)
+                return null;
+
+            var schools = this.FindSchools(school_ids);
+            if (schools is null)
+                return null;
+
+            var appUser = appUserApi.ToAppUser();
+            appUser.Id = 0;
+            appUser.UserName = UserExtensions.GenerateUserName(
+                schools.Select(s => s.Code), linkedPhone, depOrder);
+            appUser.Normalize();
+
+            await _userManager.CreateAsync(appUser);
+            await _userManager.AddToRoleAsync(appUser, roleRank.ToNormalizedString());
+
+            var user = appUserApi.User.ToUser();
+            user.AspNetUserId = appUser.Id;
+            user.IsSelfDetermined = depOrder == 0;
+            user.DependenceOrder = depOrder;
+
+            foreach (var school in schools)
+                user.Schools.Add(school);
+
+            user = await _userRepository.CreateAsync(user);
+
+            return new ApplicationUserApi(user, appUser, new(1) { roleRank });
+        }
+
+        protected virtual async Task<ApplicationUserApi?> UpdateUserAsync(
+            int id, ApplicationUserApi appUserApi, int depOrder, string linkedPhone)
+        {
+            var user = FindUser(id);
+            if (user is null)
+                return null;
+
+            var appUser = await _userManager.FindByIdAsync(user.AspNetUserId.ToString());
+
+            user = appUserApi.User.ToUser(user);
+            appUser = appUserApi.ToAppUser(appUser);
+
+            appUser.UserName = UserExtensions.GenerateUserName(
+                user.Schools.Select(s => s.Code), linkedPhone, depOrder);
+            appUser.Normalize();
+
+            user.IsSelfDetermined = depOrder == 0;
+            user.DependenceOrder = depOrder;
+
+            user = await _userRepository.UpdateAsync(user);
+            await _userManager.UpdateAsync(appUser);
+
+            var roleRanks = await _userManager.GetRoleRanksAsync(appUser);
+
+            return new ApplicationUserApi(user, appUser, roleRanks.ToList());
         }
     }
 }
