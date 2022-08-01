@@ -39,7 +39,6 @@ namespace Phoenix.Api.Entry.Controllers
 
         #region POST
 
-        [HttpPost("exceptional")]
         public override async Task<LectureApi?> PostAsync([FromBody] LectureApi lectureApi)
         {
             _logger.LogInformation("Entry -> Lecture -> Post");
@@ -86,7 +85,6 @@ namespace Phoenix.Api.Entry.Controllers
 
         #region GET
 
-        [HttpGet]
         public override IEnumerable<LectureApi>? Get()
         {
             _logger.LogInformation("Entry -> Lecture -> Get");
@@ -98,7 +96,6 @@ namespace Phoenix.Api.Entry.Controllers
                 .Select(l => new LectureApi(l));
         }
 
-        [HttpGet("{id}")]
         public override LectureApi? Get(int id)
         {
             _logger.LogInformation("Entry -> Lecture -> Get -> {id}", id);
@@ -114,7 +111,6 @@ namespace Phoenix.Api.Entry.Controllers
 
         #region PUT
 
-        [HttpPut("{id}")]
         public override async Task<LectureApi?> PutAsync(int id, [FromBody] LectureApi lectureApi)
         {
             _logger.LogInformation("Entry -> Lecture -> Put -> {id}", id);
@@ -137,7 +133,6 @@ namespace Phoenix.Api.Entry.Controllers
 
         #region DELETE
 
-        [HttpDelete("{id}")]
         public override async Task<IActionResult> DeleteAsync(int id)
         {
             _logger.LogInformation("Entry -> Lecture -> Delete -> {id}", id);

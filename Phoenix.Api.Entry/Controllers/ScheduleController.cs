@@ -38,7 +38,6 @@ namespace Phoenix.Api.Entry.Controllers
 
         #region POST
 
-        [HttpPost]
         public override async Task<ScheduleApi?> PostAsync([FromBody] ScheduleApi scheduleApi)
         {
             _logger.LogInformation("Entry -> Schedule -> Post");
@@ -58,7 +57,6 @@ namespace Phoenix.Api.Entry.Controllers
 
         #region GET
 
-        [HttpGet]
         public override IEnumerable<ScheduleApi>? Get()
         {
             _logger.LogInformation("Entry -> Schedule -> Get");
@@ -70,7 +68,6 @@ namespace Phoenix.Api.Entry.Controllers
                 .Select(s => new ScheduleApi(s));
         }
 
-        [HttpGet("{id}")]
         public override ScheduleApi? Get(int id)
         {
             _logger.LogInformation("Entry -> Schedule -> Get -> {id}", id);
@@ -99,7 +96,6 @@ namespace Phoenix.Api.Entry.Controllers
 
         #region PUT
 
-        [HttpPut("{id}")]
         public override async Task<ScheduleApi?> PutAsync(int id, [FromBody] ScheduleApi scheduleApi)
         {
             _logger.LogInformation("Entry -> Schedule -> Put -> {id}", id);
@@ -145,7 +141,6 @@ namespace Phoenix.Api.Entry.Controllers
 
         #region DELETE
 
-        [HttpDelete("{id}")]
         public override async Task<IActionResult> DeleteAsync(int id)
         {
             _logger.LogInformation("Entry -> Schedule -> Delete -> {id}", id);

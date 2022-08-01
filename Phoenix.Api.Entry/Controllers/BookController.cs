@@ -15,7 +15,6 @@
 
         #region POST
 
-        [HttpPost]
         public override async Task<BookApi?> PostAsync([FromBody] BookApi bookApi)
         {
             _logger.LogInformation("Entry -> Book -> Post");
@@ -32,7 +31,6 @@
 
         #region GET
 
-        [HttpGet]
         public override IEnumerable<BookApi>? Get()
         {
             _logger.LogInformation("Entry -> Book -> Get");
@@ -44,7 +42,6 @@
                 .Select(b => new BookApi(b));
         }
 
-        [HttpGet("{id}")]
         public override BookApi? Get(int id)
         {
             _logger.LogInformation("Entry -> Book -> Get -> {id}", id);
@@ -73,7 +70,6 @@
 
         #region PUT
 
-        [HttpPut("{id}")]
         public override async Task<BookApi?> PutAsync(int id, [FromBody] BookApi bookApi)
         {
             _logger.LogInformation("Entry -> Book -> Put -> {id}", id);
@@ -117,7 +113,6 @@
 
         #region DELETE
 
-        [HttpDelete("{id}")]
         public override async Task<IActionResult> DeleteAsync(int id)
         {
             _logger.LogInformation("Entry -> Book -> Delete -> {id}", id);

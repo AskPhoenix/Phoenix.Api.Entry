@@ -16,7 +16,6 @@
 
         #region POST
 
-        [HttpPost]
         public override async Task<SchoolApi?> PostAsync([FromBody] SchoolApi schoolApi)
         {
             _logger.LogInformation("Entry -> School -> Post");
@@ -42,7 +41,6 @@
 
         #region GET
 
-        [HttpGet]
         public override IEnumerable<SchoolApi>? Get()
         {
             _logger.LogInformation("Entry -> School -> Get");
@@ -52,7 +50,6 @@
                 .Select(s => new SchoolApi(s));
         }
 
-        [HttpGet("{id}")]
         public override SchoolApi? Get(int id)
         {
             _logger.LogInformation("Entry -> School -> Get -> {id}", id);
@@ -133,7 +130,6 @@
 
         #region PUT
 
-        [HttpPut("{id}")]
         public override async Task<SchoolApi?> PutAsync(int id, [FromBody] SchoolApi schoolApi)
         {
             _logger.LogInformation("Entry -> School -> Put -> {id}", id);
@@ -152,7 +148,6 @@
 
         #region DELETE
 
-        [HttpDelete("{id}")]
         public override async Task<IActionResult> DeleteAsync(int id)
         {
             _logger.LogInformation("Entry -> School -> Delete -> {id}", id);

@@ -124,7 +124,12 @@ else
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 app.UseSwagger();
-app.UseSwaggerUI(o => o.SwaggerEndpoint("/swagger/v3/swagger.json", "Pavo v3"));
+app.UseSwaggerUI(
+    o =>
+    {
+        o.SwaggerEndpoint("/swagger/v3/swagger.json", "Pavo v3");
+        o.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+    });
 
 app.UseHttpsRedirection();
 
