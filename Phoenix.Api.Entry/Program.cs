@@ -123,12 +123,13 @@ else
 
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
-app.UseSwagger();
+app.UseSwagger(o => o.RouteTemplate = "doc/{documentname}/swagger.json");
 app.UseSwaggerUI(
     o =>
     {
-        o.SwaggerEndpoint("/swagger/v3/swagger.json", "Pavo v3");
-        o.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+        o.SwaggerEndpoint("/doc/v3/swagger.json", "Pavo v3");
+        o.RoutePrefix = "doc";
+        //o.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
     });
 
 app.UseHttpsRedirection();
