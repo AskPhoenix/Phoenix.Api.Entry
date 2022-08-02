@@ -1,11 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Phoenix.DataHandle.Api.Models.Extensions;
+﻿using Phoenix.DataHandle.Api.Models.Extensions;
 
 namespace Phoenix.Api.Entry.Controllers
 {
-    [Authorize(AuthenticationSchemes = "Bearer")]
-    [ApiController]
-    [Route("api/[controller]")]
     public abstract class DataEntryController<TModel, TModelApi> : EntryController
         where TModel : class
         where TModelApi : class, IModelApi

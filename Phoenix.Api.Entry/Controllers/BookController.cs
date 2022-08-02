@@ -20,8 +20,6 @@
             _logger.LogInformation("Entry -> Book -> Post");
 
             var book = bookApi.ToBook();
-            book.Id = 0;
-
             book = await _bookRepository.CreateAsync(book);
 
             return new BookApi(book);

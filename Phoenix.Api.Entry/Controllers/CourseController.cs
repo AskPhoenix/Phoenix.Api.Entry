@@ -37,8 +37,6 @@
             var school = FindSchool(courseApi.SchoolId);
 
             var course = courseApi.ToCourse();
-            course.Id = 0;
-            course.Code = 0;
             //course.Users.Add(this.PhoenixUser!);
 
             if (!Check(course))

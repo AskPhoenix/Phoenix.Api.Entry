@@ -43,7 +43,6 @@ namespace Phoenix.Api.Entry.Controllers
             _logger.LogInformation("Entry -> Schedule -> Post");
 
             var schedule = scheduleApi.ToSchedule();
-            schedule.Id = 0;
 
             if (!Check(schedule))
                 return null;

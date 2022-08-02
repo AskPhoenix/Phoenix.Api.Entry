@@ -44,7 +44,6 @@ namespace Phoenix.Api.Entry.Controllers
             _logger.LogInformation("Entry -> Lecture -> Post");
 
             var lecture = lectureApi.ToLecture();
-            lecture.Id = 0;
             lecture.Occasion = LectureOccasion.Exceptional;
             lecture.ScheduleId = null;
 

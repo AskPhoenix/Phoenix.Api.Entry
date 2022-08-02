@@ -32,7 +32,6 @@
             _logger.LogInformation("Entry -> Classroom -> Post");
 
             var classroom = classroomApi.ToClassroom();
-            classroom.Id = 0;
 
             if (!Check(classroom))
                 return null;

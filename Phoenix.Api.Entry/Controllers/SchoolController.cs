@@ -24,11 +24,7 @@
                 return null;
 
             var school = schoolApi.ToSchool();
-            school.Id = 0;
-            school.Code = 0;
-            school.SchoolSetting.SchoolId = 0;
             school.Users.Add(PhoenixUser!);
-
             school = await _schoolRepository.CreateAsync(school);
 
             school.Code = -school.Id;

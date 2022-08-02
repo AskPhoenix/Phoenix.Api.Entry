@@ -1,12 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Phoenix.DataHandle.Base;
+﻿using Phoenix.DataHandle.Base;
 using Phoenix.DataHandle.Main.Types;
 
 namespace Phoenix.Api.Entry.Controllers
 {
-    [Authorize(AuthenticationSchemes = "Bearer")]
-    [ApiController]
-    [Route("api/[controller]")]
     public abstract class UserEntryController<TRoleRankApi> : EntryController
         where TRoleRankApi : Enum
     {
