@@ -14,6 +14,9 @@
             _schoolRepository = new(phoenixContext, nonObviatedOnly: true);
         }
 
+        // TODO: Return Error messages?
+        // TODO: Check if id or unique already exists in POST
+
         #region POST
 
         public override async Task<SchoolApi?> PostAsync([FromBody] SchoolApi schoolApi)
