@@ -36,6 +36,9 @@
             if (!Check(classroom))
                 return null;
 
+            if ((await _classroomRepository.FindUniqueAsync(classroomApi.SchoolId, classroomApi)) is not null)
+                return null;
+
             classroom = await _classroomRepository.CreateAsync(classroom);
 
             return new ClassroomApi(classroom);

@@ -50,6 +50,9 @@ namespace Phoenix.Api.Entry.Controllers
             if (!Check(lecture))
                 return null;
 
+            if ((await _lectureRepository.FindUniqueAsync(lectureApi.CourseId, lectureApi)) is not null)
+                return null;
+
             lecture = await _lectureRepository.CreateAsync(lecture);
 
             return new LectureApi(lecture);

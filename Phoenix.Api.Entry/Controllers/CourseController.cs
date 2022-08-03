@@ -34,17 +34,18 @@
         {
             _logger.LogInformation("Entry -> Course -> Post");
 
-            var school = FindSchool(courseApi.SchoolId);
-
             var course = courseApi.ToCourse();
             //course.Users.Add(this.PhoenixUser!);
 
             if (!Check(course))
                 return null;
 
+            if ((await _courseRepository.FindUniqueAsync(courseApi.SchoolId, courseApi)) is not null)
+                return null;
+
             course = await _courseRepository.CreateAsync(course);
 
-            course.Code = (short)school!.Courses.Count;
+            course.Code = (short)FindSchool(courseApi.SchoolId)!.Courses.Count;
             course = await _courseRepository.UpdateAsync(course);
 
             return new CourseApi(course);

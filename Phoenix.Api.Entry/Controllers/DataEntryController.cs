@@ -14,7 +14,6 @@ namespace Phoenix.Api.Entry.Controllers
         {
         }
 
-        // TODO: Check if unique model already exists in POST
         [HttpPost]
         public abstract Task<TModelApi?> PostAsync([FromBody] TModelApi modelApi);
 

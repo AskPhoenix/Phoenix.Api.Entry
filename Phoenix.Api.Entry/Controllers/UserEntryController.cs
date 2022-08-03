@@ -150,6 +150,10 @@ namespace Phoenix.Api.Entry.Controllers
             if (roleRank == RoleRank.None)
                 return null;
 
+            if (!string.IsNullOrEmpty(appUserApi.PhoneNumber))
+                if ((await _userManager.FindByPhoneNumberAsync(appUserApi.PhoneNumber)) is not null)
+                    return null;
+
             var schools = this.FindSchools(school_ids);
             if (schools is null)
                 return null;

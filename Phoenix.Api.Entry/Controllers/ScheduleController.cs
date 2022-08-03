@@ -47,6 +47,9 @@ namespace Phoenix.Api.Entry.Controllers
             if (!Check(schedule))
                 return null;
 
+            if ((await _scheduleRepository.FindUniqueAsync(scheduleApi.CourseId, scheduleApi)) is not null)
+                return null;
+
             schedule = await _scheduleRepository.CreateAsync(schedule);
 
             return new ScheduleApi(schedule);

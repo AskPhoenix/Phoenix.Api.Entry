@@ -19,6 +19,9 @@
         {
             _logger.LogInformation("Entry -> Book -> Post");
 
+            if ((await _bookRepository.FindUniqueAsync(bookApi)) is not null)
+                return null;
+
             var book = bookApi.ToBook();
             book = await _bookRepository.CreateAsync(book);
 

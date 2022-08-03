@@ -15,7 +15,9 @@
         }
 
         // TODO: Return Error messages?
-        // TODO: Check if id or unique already exists in POST
+
+        // TODO: Cascade Tables in DB for DELETE operations
+        // TODO: Obviate first and DELETE after some time (with cronjob)
 
         #region POST
 
@@ -24,6 +26,9 @@
             _logger.LogInformation("Entry -> School -> Post");
 
             if (!CheckUserAuth())
+                return null;
+
+            if ((await _schoolRepository.FindUniqueAsync(schoolApi)) is not null)
                 return null;
 
             var school = schoolApi.ToSchool();
