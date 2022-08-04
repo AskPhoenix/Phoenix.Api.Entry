@@ -37,7 +37,7 @@ namespace Phoenix.Api.Entry.Controllers
 
         protected IEnumerable<Book>? FindBooks()
         {
-            return this.FindCourses()?
+            return this.FindSchools()?
                 .SelectMany(c => c.Books);
         }
 
