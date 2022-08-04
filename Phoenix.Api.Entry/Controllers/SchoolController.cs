@@ -113,7 +113,7 @@
 
             var users = school.Users.Where(u => !u.ObviatedAt.HasValue);
 
-            return await this.GetApplicationUsersAsync(users);
+            return await this.GetApplicationUsersApiAsync(users);
         }
 
         #endregion

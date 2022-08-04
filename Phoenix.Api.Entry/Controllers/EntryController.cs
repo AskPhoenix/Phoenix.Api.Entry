@@ -16,12 +16,10 @@ namespace Phoenix.Api.Entry.Controllers
         {
         }
 
-        protected async Task<IEnumerable<ApplicationUserApi>> GetApplicationUsersAsync(IEnumerable<User> users)
+        protected async Task<IEnumerable<ApplicationUserApi>> GetApplicationUsersApiAsync(IEnumerable<User> users)
         {
             if (users is null)
                 throw new ArgumentNullException(nameof(users));
-
-            var nonObviatedUsers = users.Where(u => u.ObviatedAt == null);
 
             var tore = new List<ApplicationUserApi>(users.Count());
             foreach (var user in users)

@@ -74,7 +74,35 @@ namespace Phoenix.Api.Entry.Controllers
             return (await this.GetAsync())?.Where(au => au.Roles.Any(r => r.ToRoleRank() == roleRank));
         }
 
-        // TODO: Get Parents/Children
+        [HttpGet("{id}/parents")]
+        public async Task<IEnumerable<ApplicationUserApi>?> GetParentsAsync(int id)
+        {
+            _logger.LogInformation("Entry -> Client -> Get -> Parents -> {id}", id);
+
+            var user = FindUser(id);
+            if (user is null)
+                return null;
+
+            var parents = user.Parents
+                .Where(p => !p.ObviatedAt.HasValue);
+
+            return await this.GetApplicationUsersApiAsync(parents);
+        }
+
+        [HttpGet("{id}/children")]
+        public async Task<IEnumerable<ApplicationUserApi>?> GetChildrenAsync(int id)
+        {
+            _logger.LogInformation("Entry -> Client -> Get -> Children -> {id}", id);
+
+            var user = FindUser(id);
+            if (user is null)
+                return null;
+
+            var children = user.Children
+                .Where(p => !p.ObviatedAt.HasValue);
+
+            return await this.GetApplicationUsersApiAsync(children);
+        }
 
         #endregion
 
@@ -94,7 +122,6 @@ namespace Phoenix.Api.Entry.Controllers
 
             var parents = user.Parents
                 .Where(p => !p.ObviatedAt.HasValue);
-
             var appParents = parents
                 .Select(p => _userManager.FindByIdAsync(p.AspNetUserId.ToString()).Result);
 

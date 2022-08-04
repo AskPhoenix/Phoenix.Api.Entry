@@ -126,7 +126,7 @@
 
             var users = course.Users.Where(u => !u.ObviatedAt.HasValue);
 
-            return await this.GetApplicationUsersAsync(users);
+            return await this.GetApplicationUsersApiAsync(users);
         }
 
         #endregion
@@ -201,7 +201,7 @@
 
             course = await _courseRepository.UpdateAsync(course);
 
-            return await this.GetApplicationUsersAsync(course.Users);
+            return await this.GetApplicationUsersApiAsync(course.Users);
         }
 
         #endregion

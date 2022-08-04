@@ -25,7 +25,7 @@ namespace Phoenix.Api.Entry.Controllers
             if (users is null)
                 return null;
 
-            return await this.GetApplicationUsersAsync(users);
+            return await this.GetApplicationUsersApiAsync(users);
         }
 
         [HttpGet("{role}")]
