@@ -131,8 +131,8 @@ namespace Phoenix.Api.Entry.Controllers
             var lecturesFinal = lecturesCreated.Concat(lecturesUpdated);
 
             // TODO: Check if this translates to SQL
-            var lecturesToDelete = schedule.Lectures.Where(l => !lecturesFinal.Contains(l));
-            await _lectureRepository.DeleteRangeAsync(lecturesToDelete);
+            var lecturesToObviate = schedule.Lectures.Where(l => !lecturesFinal.Contains(l));
+            await _lectureRepository.ObviateRangeAsync(lecturesToObviate);
 
             return lecturesFinal.Select(l => new LectureApi(l));
         }
