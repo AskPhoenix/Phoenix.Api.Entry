@@ -21,7 +21,7 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> User -> Get");
 
-            var users = this.PhoenixUser?.Schools.SelectMany(s => s.Users);
+            var users = FindUsers();
             if (users is null)
                 return null;
 
@@ -56,6 +56,7 @@ namespace Phoenix.Api.Entry.Controllers
                 return null;
 
             return user.Schools
+                .Where(s => !s.ObviatedAt.HasValue)
                 .Select(s => new SchoolApi(s));
         }
 
@@ -69,6 +70,7 @@ namespace Phoenix.Api.Entry.Controllers
                 return null;
 
             return user.Courses
+                .Where(c => !c.ObviatedAt.HasValue)
                 .Select(c => new CourseApi(c));
         }
 
@@ -121,7 +123,7 @@ namespace Phoenix.Api.Entry.Controllers
             if (user is null)
                 return BadRequest();
 
-            await _userRepository.DeleteAsync(user);
+            await _userRepository.ObviateAsync(user);
 
             return Ok();
         }

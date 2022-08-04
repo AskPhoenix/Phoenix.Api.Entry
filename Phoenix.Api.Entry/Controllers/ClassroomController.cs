@@ -11,7 +11,7 @@
             ILogger<ClassroomController> logger)
             : base(phoenixContext, userManager, logger)
         {
-            _classroomRepository = new(phoenixContext, nonObviatedOnly: true);
+            _classroomRepository = new(phoenixContext, nonObviatedOnly: false);
         }
 
         protected override bool Check(Classroom classroom)
@@ -52,9 +52,7 @@
         {
             _logger.LogInformation("Entry -> Classroom -> Get");
 
-            return PhoenixUser?
-                .Schools
-                .SelectMany(s => s.Classrooms)
+            return FindClassrooms()?
                 .Select(c => new ClassroomApi(c));
         }
 
@@ -79,6 +77,7 @@
                 return null;
 
             return classroom.Lectures
+                .Where(l => !l.ObviatedAt.HasValue)
                 .Select(l => new LectureApi(l));
         }
 
@@ -92,6 +91,7 @@
                 return null;
 
             return classroom.Schedules
+                .Where(l => !l.ObviatedAt.HasValue)
                 .Select(s => new ScheduleApi(s));
         }
 
@@ -132,7 +132,7 @@
             if (classroom is null)
                 return BadRequest();
 
-            await _classroomRepository.DeleteAsync(classroom);
+            await _classroomRepository.ObviateAsync(classroom);
 
             return Ok();
         }

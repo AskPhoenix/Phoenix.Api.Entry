@@ -35,17 +35,29 @@ namespace Phoenix.Api.Entry.Controllers
             return tore;
         }
 
-        protected Course? FindCourse(int courseId)
+        protected IEnumerable<Course>? FindCourses(bool nonObviatedOnly = true)
         {
-            return this.PhoenixUser?.Schools
+            return this.FindSchools(nonObviatedOnly)?
                 .SelectMany(s => s.Courses)
+                .Where(c => !nonObviatedOnly || (!c.ObviatedAt.HasValue && nonObviatedOnly));
+        }
+
+        protected Course? FindCourse(int courseId, bool nonObviatedOnly = true)
+        {
+            return this.FindCourses(nonObviatedOnly)?
                 .SingleOrDefault(c => c.Id == courseId);
         }
 
-        protected User? FindUser(int userId)
+        protected IEnumerable<User>? FindUsers(bool nonObviatedOnly = true)
         {
-            return this.PhoenixUser?.Schools
+            return this.FindSchools(nonObviatedOnly)?
                 .SelectMany(s => s.Users)
+                .Where(u => !nonObviatedOnly || (!u.ObviatedAt.HasValue && nonObviatedOnly));
+        }
+
+        protected User? FindUser(int userId, bool nonObviatedOnly = true)
+        {
+            return this.FindUsers(nonObviatedOnly)?
                 .SingleOrDefault(u => u.AspNetUserId == userId);
         }
     }

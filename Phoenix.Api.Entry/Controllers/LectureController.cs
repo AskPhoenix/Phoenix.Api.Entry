@@ -14,7 +14,7 @@ namespace Phoenix.Api.Entry.Controllers
             ILogger<LectureController> logger)
             : base(phoenixContext, userManager, logger)
         {
-            _lectureRepository = new(phoenixContext);
+            _lectureRepository = new(phoenixContext, nonObviatedOnly: false);
         }
 
         protected override bool Check(Lecture lecture)
@@ -91,10 +91,7 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> Lecture -> Get");
 
-            return PhoenixUser?
-                .Schools
-                .SelectMany(s => s.Courses)
-                .SelectMany(c => c.Lectures)
+            return FindLectures()?
                 .Select(l => new LectureApi(l));
         }
 
@@ -146,7 +143,7 @@ namespace Phoenix.Api.Entry.Controllers
             if (lecture is null)
                 return BadRequest();
 
-            await _lectureRepository.DeleteAsync(lecture);
+            await _lectureRepository.ObviateAsync(lecture);
 
             return Ok();
         }

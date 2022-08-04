@@ -19,9 +19,6 @@
         {
             _logger.LogInformation("Entry -> Book -> Post");
 
-            if ((await _bookRepository.FindUniqueAsync(bookApi)) is not null)
-                return null;
-
             var book = bookApi.ToBook();
             book = await _bookRepository.CreateAsync(book);
 
@@ -36,11 +33,7 @@
         {
             _logger.LogInformation("Entry -> Book -> Get");
 
-            return PhoenixUser?
-                .Schools
-                .SelectMany(s => s.Courses)
-                .SelectMany(c => c.Books)
-                .Select(b => new BookApi(b));
+            return FindBooks()?.Select(b => new BookApi(b));
         }
 
         public override BookApi? Get(int id)
@@ -64,6 +57,7 @@
                 return null;
 
             return book.Courses
+                .Where(c => !c.ObviatedAt.HasValue)
                 .Select(c => new CourseApi(c));
         }
 

@@ -14,8 +14,8 @@ namespace Phoenix.Api.Entry.Controllers
             ILogger<ScheduleController> logger)
             : base(phoenixContext, userManager, logger)
         {
-            _scheduleRepository = new(phoenixContext, nonObviatedOnly: true);
-            _lectureRepository = new(phoenixContext, nonObviatedOnly: true);
+            _scheduleRepository = new(phoenixContext, nonObviatedOnly: false);
+            _lectureRepository = new(phoenixContext, nonObviatedOnly: false);
         }
 
         protected override bool Check(Schedule schedule)
@@ -63,10 +63,7 @@ namespace Phoenix.Api.Entry.Controllers
         {
             _logger.LogInformation("Entry -> Schedule -> Get");
 
-            return PhoenixUser?
-                .Schools
-                .SelectMany(s => s.Courses)
-                .SelectMany(c => c.Schedules)
+            return FindSchedules()?
                 .Select(s => new ScheduleApi(s));
         }
 
@@ -91,6 +88,7 @@ namespace Phoenix.Api.Entry.Controllers
                 return null;
 
             return schedule.Lectures
+                .Where(l => !l.ObviatedAt.HasValue)
                 .Select(l => new LectureApi(l));
         }
 
@@ -154,7 +152,7 @@ namespace Phoenix.Api.Entry.Controllers
             if (schedule is null)
                 return BadRequest();
 
-            await _scheduleRepository.DeleteAsync(schedule);
+            await _scheduleRepository.ObviateAsync(schedule);
 
             return Ok();
         }

@@ -11,7 +11,7 @@
             ILogger<CourseController> logger)
             : base(phoenixContext, userManager, logger)
         {
-            _courseRepository = new(phoenixContext, nonObviatedOnly: true);
+            _courseRepository = new(phoenixContext, nonObviatedOnly: false);
         }
 
         protected override bool Check(Course course)
@@ -59,9 +59,7 @@
         {
             _logger.LogInformation("Entry -> Course -> Get");
 
-            return PhoenixUser?
-                .Schools
-                .SelectMany(s => s.Courses)
+            return FindCourses()?
                 .Select(c => new CourseApi(c));
         }
 
@@ -99,6 +97,7 @@
                 return null;
 
             return course.Lectures
+                .Where(l => !l.ObviatedAt.HasValue)
                 .Select(l => new LectureApi(l));
         }
 
@@ -112,6 +111,7 @@
                 return null;
 
             return course.Schedules
+                .Where(s => !s.ObviatedAt.HasValue)
                 .Select(s => new ScheduleApi(s));
         }
 
@@ -124,7 +124,9 @@
             if (course is null)
                 return null;
 
-            return await this.GetApplicationUsersAsync(course.Users);
+            var users = course.Users.Where(u => !u.ObviatedAt.HasValue);
+
+            return await this.GetApplicationUsersAsync(users);
         }
 
         #endregion
@@ -217,7 +219,7 @@
             if (course is null)
                 return BadRequest();
 
-            await _courseRepository.DeleteAsync(course);
+            await _courseRepository.ObviateAsync(course);
 
             return Ok();
         }

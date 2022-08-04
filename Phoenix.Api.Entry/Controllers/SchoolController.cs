@@ -11,13 +11,10 @@
             ILogger<SchoolController> logger)
             : base(phoenixContext, userManager, logger)
         {
-            _schoolRepository = new(phoenixContext, nonObviatedOnly: true);
+            _schoolRepository = new(phoenixContext, nonObviatedOnly: false);
         }
 
         // TODO: Return Error messages?
-
-        // TODO: Cascade Tables in DB for DELETE operations
-        // TODO: Obviate first and DELETE after some time (with cronjob)
 
         #region POST
 
@@ -49,8 +46,7 @@
         {
             _logger.LogInformation("Entry -> School -> Get");
 
-            return PhoenixUser?
-                .Schools
+            return this.FindSchools()?
                 .Select(s => new SchoolApi(s));
         }
 
@@ -88,7 +84,7 @@
                 return null;
 
             return school.Courses
-                .Where(c => c.ObviatedAt == null)
+                .Where(c => !c.ObviatedAt.HasValue)
                 .Select(c => new CourseApi(c));
         }
 
@@ -102,7 +98,7 @@
                 return null;
 
             return school.Classrooms
-                .Where(c => c.ObviatedAt == null)
+                .Where(c => !c.ObviatedAt.HasValue)
                 .Select(c => new ClassroomApi(c));
         }
 
@@ -115,7 +111,9 @@
             if (school is null)
                 return null;
 
-            return await this.GetApplicationUsersAsync(school.Users);
+            var users = school.Users.Where(u => !u.ObviatedAt.HasValue);
+
+            return await this.GetApplicationUsersAsync(users);
         }
 
         #endregion
@@ -130,7 +128,6 @@
             if (school is null)
                 return null;
 
-            // TODO: Ensure that this update does not empty the collections
             school = await _schoolRepository.UpdateAsync(schoolApi.ToSchool(school));
 
             return new SchoolApi(school);
@@ -151,7 +148,7 @@
             if (school is null)
                 return BadRequest();
 
-            await _schoolRepository.DeleteAsync(school);
+            await _schoolRepository.ObviateAsync(school);
 
             return Ok();
         }

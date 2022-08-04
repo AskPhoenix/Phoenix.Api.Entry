@@ -28,7 +28,6 @@ namespace Phoenix.Api.Entry.Controllers
         public async Task<SchoolConnectionApi?> FacebookRegisterAsync(
             [Required] int school_id, string key, bool activate = true)
         {
-            // TODO: Allow registration to other channels as well
             // TODO: Connect to Azure Bot
 
             _logger.LogInformation("Entry -> School Connection -> Facebook -> Register -> {id}", school_id);

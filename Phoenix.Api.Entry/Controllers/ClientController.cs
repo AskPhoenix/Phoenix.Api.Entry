@@ -74,6 +74,8 @@ namespace Phoenix.Api.Entry.Controllers
             return (await this.GetAsync())?.Where(au => au.Roles.Any(r => r.ToRoleRank() == roleRank));
         }
 
+        // TODO: Get Parents/Children
+
         #endregion
 
         #region PUT
@@ -90,10 +92,13 @@ namespace Phoenix.Api.Entry.Controllers
             if (user is null)
                 return null;
 
-            var appParents = user.Parents
+            var parents = user.Parents
+                .Where(p => !p.ObviatedAt.HasValue);
+
+            var appParents = parents
                 .Select(p => _userManager.FindByIdAsync(p.AspNetUserId.ToString()).Result);
 
-            var studentDependence = this.CalculateStudentDependence(appUserApi, user.Parents, appParents);
+            var studentDependence = this.CalculateStudentDependence(appUserApi, parents, appParents);
             if (studentDependence is null)
                 return null;
 

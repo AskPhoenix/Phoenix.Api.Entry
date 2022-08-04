@@ -35,34 +35,54 @@ namespace Phoenix.Api.Entry.Controllers
             return this.CheckUserAuth() && model is not null;
         }
 
+        protected IEnumerable<Book>? FindBooks()
+        {
+            return this.FindCourses()?
+                .SelectMany(c => c.Books);
+        }
+
         protected Book? FindBook(int bookId)
         {
-            return this.PhoenixUser?.Schools
-                .SelectMany(s => s.Courses)
-                .SelectMany(c => c.Books)
+            return this.FindBooks()?
                 .SingleOrDefault(b => b.Id == bookId);
         }
 
-        protected Schedule? FindSchedule(int scheduleId)
+        protected IEnumerable<Schedule>? FindSchedules(bool nonObviatedOnly = true)
         {
-            return this.PhoenixUser?.Schools
-                .SelectMany(s => s.Courses)
+            return this.FindCourses(nonObviatedOnly)?
                 .SelectMany(c => c.Schedules)
+                .Where(s => !nonObviatedOnly || (!s.ObviatedAt.HasValue && nonObviatedOnly));
+        }
+
+        protected Schedule? FindSchedule(int scheduleId, bool nonObviatedOnly = true)
+        {
+            return this.FindSchedules(nonObviatedOnly)?
                 .SingleOrDefault(s => s.Id == scheduleId);
         }
 
-        protected Classroom? FindClassroom(int classroomId)
+        protected IEnumerable<Classroom>? FindClassrooms(bool nonObviatedOnly = true)
         {
-            return this.PhoenixUser?.Schools
+            return this.FindSchools(nonObviatedOnly)?
                 .SelectMany(s => s.Classrooms)
+                .Where(c => !nonObviatedOnly || (!c.ObviatedAt.HasValue && nonObviatedOnly));
+        }
+
+        protected Classroom? FindClassroom(int classroomId, bool nonObviatedOnly = true)
+        {
+            return this.FindClassrooms(nonObviatedOnly)?
                 .SingleOrDefault(c => c.Id == classroomId);
         }
 
-        protected Lecture? FindLecture(int lectureId)
+        protected IEnumerable<Lecture>? FindLectures(bool nonObviatedOnly = true)
         {
-            return this.PhoenixUser?.Schools
-                .SelectMany(s => s.Courses)
+            return this.FindCourses(nonObviatedOnly)?
                 .SelectMany(c => c.Lectures)
+                .Where(c => !nonObviatedOnly || (!c.ObviatedAt.HasValue && nonObviatedOnly));
+        }
+
+        protected Lecture? FindLecture(int lectureId, bool nonObviatedOnly = true)
+        {
+            return this.FindLectures(nonObviatedOnly)?
                 .SingleOrDefault(l => l.Id == lectureId);
         }
     }
