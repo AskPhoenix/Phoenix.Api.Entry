@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Phoenix.DataHandle.Api;
 using Phoenix.DataHandle.Main.Types;
+using Phoenix.DataHandle.Senders;
 using System.ComponentModel.DataAnnotations;
 
 namespace Phoenix.Api.Entry.Controllers
@@ -11,14 +12,17 @@ namespace Phoenix.Api.Entry.Controllers
     [ApiExplorerSettings(GroupName = "1b")]
     public class SchoolConnectionController : ApplicationController
     {
+        private readonly EmailSender _emailSender;
         private readonly SchoolConnectionRepository _schoolConnectionRepository;
 
         public SchoolConnectionController(
             PhoenixContext phoenixContext,
             ApplicationUserManager userManager,
-            ILogger<SchoolConnectionController> logger)
+            ILogger<SchoolConnectionController> logger,
+            EmailSender emailSender)
             : base(phoenixContext, userManager, logger)
         {
+            _emailSender = emailSender;
             _schoolConnectionRepository = new(phoenixContext);
         }
 
@@ -49,6 +53,12 @@ namespace Phoenix.Api.Entry.Controllers
             {
                 return null;
             }
+
+            await _emailSender.SendAsync(
+                to: "it@askphoenix.gr",
+                subject: "[Pavo API] New School Connection",
+                plainTextContent: $"There is a new Facebook connection awating for school '{school.Name}' " +
+                    $"with id {school.Id}.\n\nFacebook key: {key}\n");
 
             return new SchoolConnectionApi(connection);
         }

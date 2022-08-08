@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Phoenix.DataHandle.Senders;
 using System.Text;
 using static Phoenix.DataHandle.Api.DocumentationHelper;
 
@@ -38,6 +39,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
+
+builder.Services.AddScoped(_ =>
+    new EmailSender(builder.Configuration["SendGrid:Key"]));
 
 builder.Services.AddApplicationInsightsTelemetry(
     o => o.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"]);
