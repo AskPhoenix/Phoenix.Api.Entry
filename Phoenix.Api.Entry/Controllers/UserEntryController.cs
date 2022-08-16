@@ -1,4 +1,5 @@
-﻿using Phoenix.DataHandle.Base;
+﻿using Microsoft.AspNetCore.Identity;
+using Phoenix.DataHandle.Base;
 using Phoenix.DataHandle.Main.Types;
 
 namespace Phoenix.Api.Entry.Controllers
@@ -6,12 +7,16 @@ namespace Phoenix.Api.Entry.Controllers
     public abstract class UserEntryController<TRoleRankApi> : EntryController
         where TRoleRankApi : Enum
     {
+        private readonly ApplicationStore _appStore;
+
         public UserEntryController(
             PhoenixContext phoenixContext,
             ApplicationUserManager userManager,
+            IUserStore<ApplicationUser> appStore,
             ILogger<UserEntryController<TRoleRankApi>> logger)
             : base(phoenixContext, userManager, logger)
         {
+            _appStore = (ApplicationStore)appStore;
         }
 
         #region GET
@@ -160,11 +165,14 @@ namespace Phoenix.Api.Entry.Controllers
             if (schools is null)
                 return null;
 
-            var appUser = appUserApi.ToAppUser();
-            appUser.Id = 0;
-            appUser.UserName = UserExtensions.GenerateUserName(
-                schools.Select(s => s.Code), linkedPhone, depOrder);
-            appUser.Normalize();
+            var appUser = Activator.CreateInstance<ApplicationUser>();
+            var username = UserExtensions.GenerateUserName(schools.Select(s => s.Code), linkedPhone, depOrder);
+
+            await _appStore.SetUserNameAsync(appUser, username);
+            await _appStore.SetNormalizedUserNameAsync(appUser, ApplicationUser.NormFunc(username));
+
+            await _appStore.SetPhoneNumberAsync(appUser, appUserApi.PhoneNumber);
+            await _appStore.SetPhoneNumberConfirmedAsync(appUser, false);
 
             await _userManager.CreateAsync(appUser);
             await _userManager.AddToRoleAsync(appUser, roleRank.ToNormalizedString());
@@ -192,14 +200,17 @@ namespace Phoenix.Api.Entry.Controllers
             var appUser = await _userManager.FindByIdAsync(user.AspNetUserId.ToString());
 
             user = appUserApi.User.ToUser(user);
-            appUser = appUserApi.ToAppUser(appUser);
-
-            appUser.UserName = UserExtensions.GenerateUserName(
-                user.Schools.Select(s => s.Code), linkedPhone, depOrder);
-            appUser.Normalize();
 
             user.IsSelfDetermined = depOrder == 0;
             user.DependenceOrder = depOrder;
+
+            var username = UserExtensions.GenerateUserName(
+                user.Schools.Select(s => s.Code), linkedPhone, depOrder);
+
+            await _appStore.SetUserNameAsync(appUser, username);
+            await _appStore.SetNormalizedUserNameAsync(appUser, ApplicationUser.NormFunc(username));
+
+            await _appStore.SetPhoneNumberAsync(appUser, appUserApi.PhoneNumber);
 
             user = await _userRepository.UpdateAsync(user);
             await _userManager.UpdateAsync(appUser);

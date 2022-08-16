@@ -1,4 +1,5 @@
-﻿using Phoenix.DataHandle.Api.Types;
+﻿using Microsoft.AspNetCore.Identity;
+using Phoenix.DataHandle.Api.Types;
 using Phoenix.DataHandle.Main.Types;
 using System.ComponentModel.DataAnnotations;
 
@@ -10,8 +11,9 @@ namespace Phoenix.Api.Entry.Controllers
         public ClientController(
             PhoenixContext phoenixContext,
             ApplicationUserManager userManager,
+            IUserStore<ApplicationUser> appStore,
             ILogger<ClientController> logger)
-            : base(phoenixContext, userManager, logger)
+            : base(phoenixContext, userManager, appStore, logger)
         {
         }
 
