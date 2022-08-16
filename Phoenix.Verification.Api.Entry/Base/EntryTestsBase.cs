@@ -2,6 +2,8 @@
 {
     public class EntryTestsBase : AuthenticatedTestsBase
     {
+        // TODO: Create tests for all controllers
+
         protected readonly string API_BASE;
 
         public EntryTestsBase()

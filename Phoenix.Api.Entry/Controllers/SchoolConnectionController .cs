@@ -100,7 +100,6 @@ namespace Phoenix.Api.Entry.Controllers
             if (string.IsNullOrWhiteSpace(key))
                 return null;
 
-            School? school;
             SchoolConnection? connection;
             try
             {
@@ -110,7 +109,7 @@ namespace Phoenix.Api.Entry.Controllers
                 if (connection is null)
                     return null;
 
-                school = FindSchool(connection.TenantId);
+                var school = FindSchool(connection.TenantId);
                 if (school is null)
                     return null;
 
@@ -133,7 +132,6 @@ namespace Phoenix.Api.Entry.Controllers
             if (string.IsNullOrWhiteSpace(key))
                 return null;
 
-            School? school;
             SchoolConnection? connection;
             try
             {
@@ -143,12 +141,47 @@ namespace Phoenix.Api.Entry.Controllers
                 if (connection is null)
                     return null;
 
-                school = FindSchool(connection.TenantId);
+                var school = FindSchool(connection.TenantId);
                 if (school is null)
                     return null;
 
                 connection = await _schoolConnectionRepository
                     .DisconnectAsync(ChannelProvider.Facebook, key);
+            }
+            catch (InvalidOperationException)
+            {
+                return null;
+            }
+
+            return new SchoolConnectionApi(connection);
+        }
+
+        [HttpPut("facebook/{key}/update-token")]
+        public async Task<SchoolConnectionApi?> FacebookDisconnectAsync(string key, [Required] string token)
+        {
+            _logger.LogInformation("Entry -> School Connection -> Facebook -> Update Token");
+
+            if (string.IsNullOrWhiteSpace(key))
+                return null;
+            if (string.IsNullOrWhiteSpace(token))
+                return null;
+
+            SchoolConnection? connection;
+            try
+            {
+                connection = await _schoolConnectionRepository
+                    .FindUniqueAsync(ChannelProvider.Facebook, key);
+
+                if (connection is null)
+                    return null;
+
+                var school = FindSchool(connection.TenantId);
+                if (school is null)
+                    return null;
+
+                connection.ChannelToken = token;
+
+                connection = await _schoolConnectionRepository.UpdateAsync(connection);
             }
             catch (InvalidOperationException)
             {
