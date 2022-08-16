@@ -33,7 +33,7 @@ namespace Phoenix.Api.Entry.Controllers
             return await this.GetApplicationUsersApiAsync(users);
         }
 
-        [HttpGet("{role}")]
+        [HttpGet("role/{role}")]
         public abstract Task<IEnumerable<ApplicationUserApi>?> GetAsync(TRoleRankApi role);
 
         [HttpGet("{id}")]
