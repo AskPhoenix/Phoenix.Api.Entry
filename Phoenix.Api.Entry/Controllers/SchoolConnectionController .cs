@@ -56,7 +56,7 @@ namespace Phoenix.Api.Entry.Controllers
 
             await _emailSender.SendAsync(
                 to: "it@askphoenix.gr",
-                subject: "[Pavo API] New School Connection",
+                subject: "[Pavo API] [Create] School Connection",
                 plainTextContent: $"There is a new Facebook connection awating for school '{school.Name}' " +
                     $"with id {school.Id}.\n\nFacebook key: {key}\n");
 
@@ -214,6 +214,12 @@ namespace Phoenix.Api.Entry.Controllers
                 return BadRequest();
 
             await _schoolConnectionRepository.DeleteAsync(connection);
+
+            await _emailSender.SendAsync(
+                to: "it@askphoenix.gr",
+                subject: "[Pavo API] [Remove] School Connection",
+                plainTextContent: $"There is a Facebook connection deleted from school '{school.Name}' " +
+                    $"with id {school.Id}.\n\nFacebook key: {key}\n");
 
             return Ok();
         }
