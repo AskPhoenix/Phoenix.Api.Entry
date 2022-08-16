@@ -171,8 +171,15 @@ namespace Phoenix.Api.Entry.Controllers
             await _appStore.SetUserNameAsync(appUser, username);
             await _appStore.SetNormalizedUserNameAsync(appUser, ApplicationUser.NormFunc(username));
 
-            await _appStore.SetPhoneNumberAsync(appUser, appUserApi.PhoneNumber);
-            await _appStore.SetPhoneNumberConfirmedAsync(appUser, false);
+            if (!string.IsNullOrEmpty(appUserApi.PhoneNumber))
+            {
+                string phone = appUserApi.PhoneNumber;
+                if (!phone.StartsWith('+'))
+                    phone = schools.First().SchoolSetting.PhoneCountryCode + phone;
+
+                await _appStore.SetPhoneNumberAsync(appUser, phone);
+                await _appStore.SetPhoneNumberConfirmedAsync(appUser, false);
+            }
 
             await _userManager.CreateAsync(appUser);
             await _userManager.AddToRoleAsync(appUser, roleRank.ToNormalizedString());
@@ -204,13 +211,23 @@ namespace Phoenix.Api.Entry.Controllers
             user.IsSelfDetermined = depOrder == 0;
             user.DependenceOrder = depOrder;
 
+            if (!linkedPhone.StartsWith('+'))
+                linkedPhone = user.Schools.First().SchoolSetting.PhoneCountryCode + linkedPhone;
+
             var username = UserExtensions.GenerateUserName(
                 user.Schools.Select(s => s.Code), linkedPhone, depOrder);
 
             await _appStore.SetUserNameAsync(appUser, username);
             await _appStore.SetNormalizedUserNameAsync(appUser, ApplicationUser.NormFunc(username));
 
-            await _appStore.SetPhoneNumberAsync(appUser, appUserApi.PhoneNumber);
+            if (!string.IsNullOrEmpty(appUserApi.PhoneNumber))
+            {
+                string phone = appUserApi.PhoneNumber;
+                if (!phone.StartsWith('+'))
+                    phone = user.Schools.First().SchoolSetting.PhoneCountryCode + phone;
+                
+                await _appStore.SetPhoneNumberAsync(appUser, phone);
+            }
 
             user = await _userRepository.UpdateAsync(user);
             await _userManager.UpdateAsync(appUser);
